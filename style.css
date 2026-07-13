@@ -197,11 +197,23 @@ html, body {
     align-items: center;
 }
 
-.menu-footer {
+.menu-controls {
     margin-top: 36px;
-    font-size: 7px;
-    color: var(--text-muted);
-    letter-spacing: 1px;
+    font-size: 8px;
+    color: var(--text-secondary);
+    line-height: 2;
+    text-align: left;
+    display: inline-block;
+    background: rgba(10, 14, 26, 0.6);
+    padding: 12px 20px;
+    border: 2px solid var(--panel-border);
+}
+
+.menu-controls p {
+    margin-bottom: 8px;
+}
+.menu-controls p:last-child {
+    margin-bottom: 0;
 }
 
 .key-hint {

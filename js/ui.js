@@ -45,6 +45,11 @@ export class UIManager { // class untuk mengatur interaksi DOM dan HTML UI
     _bindButtons() { // pasang event listener ke semua tombol UI
 
         document.getElementById('btn-start').addEventListener('click', () => {
+            const bgm = document.getElementById('bgm');
+            if (bgm) {
+                bgm.volume = 0.4; // Atur volume agar tidak terlalu berisik
+                bgm.play().catch(e => console.log("Audio play diizinkan setelah interaksi"));
+            }
             if (this._onStartGame) this._onStartGame();
         });
 
