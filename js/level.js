@@ -2,129 +2,156 @@
 
 import { checkAABB } from './physics.js';
 
-const QUIZ_DATA = [ // data soal kuis untuk npc robot
-    {
-        question: "Kenapa perak (Argentum) penting bagi industri panel surya?",
-        options: [
-            "A. Konduktor listrik terbaik di antara semua logam",
-            "B. Hanya sebagai hiasan panel",
-            "C. Untuk membuat panel lebih berat",
-            "D. Tidak ada fungsi khusus"
-        ],
-        correctIndex: 0,
-        explanation: "Benar! Perak memiliki konduktivitas listrik tertinggi di antara semua logam, sehingga sangat efisien untuk menghantarkan listrik yang dihasilkan panel surya."
-    },
-    {
-        question: "Apa yang terjadi jika permintaan (demand) perak meningkat tapi pasokan (supply) tetap?",
-        options: [
-            "A. Harga perak turun",
-            "B. Harga perak naik",
-            "C. Harga perak tetap sama",
-            "D. Perak menghilang dari pasar"
-        ],
-        correctIndex: 1,
-        explanation: "Benar! Menurut hukum supply & demand, jika permintaan naik sedangkan pasokan tetap, maka harga akan naik. Ini yang terjadi pada perak karena meningkatnya industri energi surya dan teknologi."
-    },
-    {
-        question: "Berapa persen perak dunia yang digunakan untuk industri (termasuk panel surya dan elektronik)?",
-        options: [
-            "A. Sekitar 10%",
-            "B. Sekitar 25%",
-            "C. Lebih dari 50%",
-            "D. Kurang dari 5%"
-        ],
-        correctIndex: 2,
-        explanation: "Benar! Lebih dari 50% produksi perak dunia digunakan untuk keperluan industri, termasuk panel surya, elektronik, dan peralatan medis. Ini menunjukkan pentingnya perak sebagai logam strategis."
-    }
-];
-
-const WARTA_FACTS = [ // data fakta edukasi untuk bintang warta
-    "PLTS (Pembangkit Listrik Tenaga Surya) membutuhkan perak sebagai konduktor di setiap selnya. Satu panel surya mengandung sekitar 20 gram perak!",
-    "Indonesia memiliki potensi energi surya yang besar karena terletak di garis khatulistiwa. Permintaan perak untuk panel surya terus meningkat seiring target energi terbarukan nasional.",
-    "Harga perak telah naik signifikan dalam dekade terakhir. Faktor utamanya: meningkatnya penggunaan di industri teknologi hijau dan terbatasnya cadangan tambang baru.",
-    "Selain panel surya, perak juga digunakan dalam smartphone, laptop, kendaraan listrik, dan peralatan medis. Perak adalah logam paling konduktif yang ada!"
-];
+import { QUIZ_EASY, QUIZ_MEDIUM, QUIZ_HARD, WARTA_FACTS } from './quiz-database.js';
 
 function createLevel1() { // generate data statis untuk level 1
-    const TILE = 32;
-
     return {
-        name: "Bukit Energi Hijau",
-        mission: "Kumpulkan 4 Argen-bars & Hindari Korsleting!",
-        width: 4200,
+        name: "Desa Argentara - Level 1 (Easy)",
+        mission: "Kumpulkan 4 Argen-bars & Selesaikan Kuis!",
+        width: 4800,
         height: 540,
         requiredBars: 4,
         playerSpawn: { x: 80, y: 400 },
-
-        platforms: [ // kotak-kotak pijakan solid (x, y, w, h)
-
-            { x: 0, y: 480, w: 700, h: 60, type: 'ground' },
-
-            { x: 800, y: 480, w: 600, h: 60, type: 'ground' },
-
-            { x: 1500, y: 480, w: 700, h: 60, type: 'ground' },
-
-            { x: 2400, y: 480, w: 500, h: 60, type: 'ground' },
-            { x: 3000, y: 480, w: 1200, h: 60, type: 'ground' },
-
-            { x: 320, y: 430, w: 128, h: 20, type: 'solar' },
-            { x: 520, y: 410, w: 128, h: 20, type: 'solar' },
-
-            { x: 700, y: 430, w: 120, h: 20, type: 'solar' },
-            { x: 860, y: 410, w: 130, h: 20, type: 'solar' },
-
-            { x: 1550, y: 420, w: 160, h: 20, type: 'solar' },
-            { x: 1780, y: 390, w: 140, h: 20, type: 'solar' },
-            { x: 2000, y: 360, w: 160, h: 20, type: 'solar' },
-
-            { x: 2500, y: 425, w: 140, h: 20, type: 'solar' },
-            { x: 2700, y: 400, w: 120, h: 20, type: 'solar' },
-
-            { x: 3200, y: 420, w: 160, h: 20, type: 'solar' },
-            { x: 3500, y: 390, w: 140, h: 20, type: 'solar' },
+        quizData: QUIZ_EASY,
+        platforms: [
+            { x: 0, y: 480, w: 1000, h: 60, type: 'ground' },
+            { x: 1200, y: 480, w: 1000, h: 60, type: 'ground' },
+            { x: 2400, y: 480, w: 1000, h: 60, type: 'ground' },
+            { x: 3600, y: 480, w: 1200, h: 60, type: 'ground' },
+            
+            { x: 400, y: 410, w: 128, h: 20, type: 'solar' },
+            { x: 700, y: 350, w: 128, h: 20, type: 'solar' },
+            { x: 1050, y: 350, w: 128, h: 20, type: 'solar' },
+            { x: 1600, y: 400, w: 128, h: 20, type: 'solar' },
+            { x: 2200, y: 420, w: 128, h: 20, type: 'solar' },
+            { x: 2800, y: 380, w: 128, h: 20, type: 'solar' },
+            { x: 3300, y: 320, w: 128, h: 20, type: 'solar' }
         ],
+        collectibles: [
+            { x: 450, y: 380, w: 20, h: 16, type: 'silver', collected: false },
+            { x: 1650, y: 370, w: 20, h: 16, type: 'silver', collected: false },
+            { x: 2250, y: 390, w: 20, h: 16, type: 'silver', collected: false },
+            { x: 3350, y: 290, w: 20, h: 16, type: 'silver', collected: false },
+            
+            { x: 750, y: 320, w: 20, h: 20, type: 'warta', collected: false, factIndex: 0 },
+            { x: 1100, y: 320, w: 20, h: 20, type: 'warta', collected: false, factIndex: 1 },
+            { x: 2000, y: 450, w: 20, h: 20, type: 'warta', collected: false, factIndex: 2 },
+            { x: 2900, y: 350, w: 20, h: 20, type: 'warta', collected: false, factIndex: 3 },
+            { x: 3800, y: 450, w: 20, h: 20, type: 'warta', collected: false, factIndex: 4 }
+        ],
+        hazards: [
+            { x: 1050, y: 456, w: 80, h: 24, type: 'electric_floor' },
+            { x: 2300, y: 456, w: 80, h: 24, type: 'electric_floor' },
+            { x: 3450, y: 456, w: 80, h: 24, type: 'electric_floor' }
+        ],
+        npcs: [
+            { x: 600, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 0, quizDone: false, interactZone: { x: 560, y: 400, w: 100, h: 80 } },
+            { x: 1400, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 1, quizDone: false, interactZone: { x: 1360, y: 400, w: 100, h: 80 } },
+            { x: 2100, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 2, quizDone: false, interactZone: { x: 2060, y: 400, w: 100, h: 80 } },
+            { x: 3100, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 3, quizDone: false, interactZone: { x: 3060, y: 400, w: 100, h: 80 } },
+            { x: 4200, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 4, quizDone: false, interactZone: { x: 4160, y: 400, w: 100, h: 80 } }
+        ],
+        finishGate: { x: 4600, y: 380, w: 80, h: 100 },
+        hasBoss: false
+    };
+}
 
-        collectibles: [ // item yang bisa diambil (silver / bintang warta)
-
-            { x: 370, y: 406, w: 20, h: 16, type: 'silver', collected: false },
-            { x: 560, y: 386, w: 20, h: 16, type: 'silver', collected: false },
-            { x: 1600, y: 396, w: 20, h: 16, type: 'silver', collected: false },
-            { x: 1830, y: 366, w: 20, h: 16, type: 'silver', collected: false },
-            { x: 2050, y: 336, w: 20, h: 16, type: 'silver', collected: false },
-            { x: 3550, y: 366, w: 20, h: 16, type: 'silver', collected: false },
-
-            { x: 200, y: 450, w: 20, h: 20, type: 'warta', collected: false, factIndex: 0 },
-            { x: 1000, y: 450, w: 20, h: 20, type: 'warta', collected: false, factIndex: 1 },
+function createLevel2() { // generate data statis untuk level 2
+    return {
+        name: "Pabrik Terbengkalai - Level 2 (Medium)",
+        mission: "Kumpulkan 5 Argen-bars & Hati-hati jebakan!",
+        width: 5000,
+        height: 540,
+        requiredBars: 5,
+        playerSpawn: { x: 80, y: 400 },
+        quizData: QUIZ_MEDIUM,
+        platforms: [
+            { x: 0, y: 480, w: 800, h: 60, type: 'ground' },
+            { x: 1000, y: 480, w: 500, h: 60, type: 'ground' },
+            { x: 1800, y: 480, w: 800, h: 60, type: 'ground' },
+            { x: 2900, y: 480, w: 600, h: 60, type: 'ground' },
+            { x: 3800, y: 480, w: 1200, h: 60, type: 'ground' },
+            
+            { x: 300, y: 380, w: 100, h: 20, type: 'solar' },
+            { x: 600, y: 300, w: 100, h: 20, type: 'solar' },
+            { x: 850, y: 250, w: 100, h: 20, type: 'solar' },
+            { x: 1600, y: 380, w: 100, h: 20, type: 'solar' },
+            { x: 2200, y: 320, w: 100, h: 20, type: 'solar' },
+            { x: 2650, y: 280, w: 100, h: 20, type: 'solar' },
+            { x: 3550, y: 350, w: 100, h: 20, type: 'solar' }
+        ],
+        collectibles: [
+            { x: 640, y: 270, w: 20, h: 16, type: 'silver', collected: false },
+            { x: 1640, y: 350, w: 20, h: 16, type: 'silver', collected: false },
+            { x: 2240, y: 290, w: 20, h: 16, type: 'silver', collected: false },
+            { x: 2690, y: 250, w: 20, h: 16, type: 'silver', collected: false },
+            { x: 3590, y: 320, w: 20, h: 16, type: 'silver', collected: false },
+            
+            { x: 340, y: 350, w: 20, h: 20, type: 'warta', collected: false, factIndex: 0 },
+            { x: 890, y: 220, w: 20, h: 20, type: 'warta', collected: false, factIndex: 1 },
             { x: 1900, y: 450, w: 20, h: 20, type: 'warta', collected: false, factIndex: 2 },
-            { x: 3300, y: 450, w: 20, h: 20, type: 'warta', collected: false, factIndex: 3 },
+            { x: 3100, y: 450, w: 20, h: 20, type: 'warta', collected: false, factIndex: 3 },
+            { x: 4000, y: 450, w: 20, h: 20, type: 'warta', collected: false, factIndex: 4 }
         ],
-
-        hazards: [ // rintangan listrik mematikan
-
-            { x: 950, y: 456, w: 40, h: 24, type: 'electric_floor' },
-            { x: 1700, y: 456, w: 40, h: 24, type: 'electric_floor' },
-            { x: 2100, y: 456, w: 40, h: 24, type: 'electric_floor' },
-            { x: 3400, y: 456, w: 40, h: 24, type: 'electric_floor' },
+        hazards: [
+            { x: 1100, y: 456, w: 100, h: 24, type: 'electric_floor' },
+            { x: 2000, y: 456, w: 100, h: 24, type: 'electric_floor' },
+            { x: 3000, y: 456, w: 150, h: 24, type: 'electric_floor' }
         ],
-
-        npcs: [ // daftar posisi NPC untuk kuis
-            {
-                x: 2850, y: 432, w: 28, h: 48,
-                type: 'quiz_robot',
-                quizIndex: 0,
-                quizDone: false,
-                interactZone: { x: 2810, y: 400, w: 100, h: 80 }
-            },
-            {
-                x: 3150, y: 432, w: 28, h: 48,
-                type: 'quiz_robot',
-                quizIndex: 1,
-                quizDone: false,
-                interactZone: { x: 3110, y: 400, w: 100, h: 80 }
-            }
+        npcs: [
+            { x: 1300, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 0, quizDone: false, interactZone: { x: 1260, y: 400, w: 100, h: 80 } },
+            { x: 2400, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 1, quizDone: false, interactZone: { x: 2360, y: 400, w: 100, h: 80 } },
+            { x: 3300, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 2, quizDone: false, interactZone: { x: 3260, y: 400, w: 100, h: 80 } },
+            { x: 4300, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 3, quizDone: false, interactZone: { x: 4260, y: 400, w: 100, h: 80 } },
+            { x: 4600, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 4, quizDone: false, interactZone: { x: 4560, y: 400, w: 100, h: 80 } }
         ],
+        finishGate: { x: 4850, y: 380, w: 80, h: 100 },
+        hasBoss: false
+    };
+}
 
-        finishGate: { x: 3900, y: 380, w: 80, h: 100 } // gerbang finish
+function createLevel3() { // generate data statis untuk level 3 (Boss Level)
+    return {
+        name: "Markas Subo - Level 3 (Hardcore)",
+        mission: "Selesaikan 5 Kuis, Kalahkan Subo!",
+        width: 5000,
+        height: 540,
+        requiredBars: 0,
+        playerSpawn: { x: 80, y: 400 },
+        quizData: QUIZ_HARD,
+        platforms: [
+            { x: 0, y: 480, w: 1000, h: 60, type: 'ground' },
+            { x: 1200, y: 480, w: 800, h: 60, type: 'ground' },
+            { x: 2200, y: 480, w: 800, h: 60, type: 'ground' },
+            { x: 3200, y: 480, w: 1800, h: 60, type: 'ground' }, // Boss arena panjang
+            
+            { x: 400, y: 380, w: 80, h: 20, type: 'solar' },
+            { x: 700, y: 280, w: 80, h: 20, type: 'solar' },
+            { x: 1050, y: 350, w: 80, h: 20, type: 'solar' },
+            { x: 1800, y: 350, w: 80, h: 20, type: 'solar' },
+            { x: 2100, y: 250, w: 80, h: 20, type: 'solar' }
+        ],
+        collectibles: [
+            { x: 430, y: 350, w: 20, h: 20, type: 'warta', collected: false, factIndex: 0 },
+            { x: 730, y: 250, w: 20, h: 20, type: 'warta', collected: false, factIndex: 1 },
+            { x: 1400, y: 450, w: 20, h: 20, type: 'warta', collected: false, factIndex: 2 },
+            { x: 2130, y: 220, w: 20, h: 20, type: 'warta', collected: false, factIndex: 3 },
+            { x: 2800, y: 450, w: 20, h: 20, type: 'warta', collected: false, factIndex: 4 }
+        ],
+        hazards: [
+            { x: 1200, y: 456, w: 200, h: 24, type: 'electric_floor' },
+            { x: 2300, y: 456, w: 200, h: 24, type: 'electric_floor' }
+        ],
+        npcs: [
+            { x: 900, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 0, quizDone: false, interactZone: { x: 860, y: 400, w: 100, h: 80 } },
+            { x: 1600, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 1, quizDone: false, interactZone: { x: 1560, y: 400, w: 100, h: 80 } },
+            { x: 2000, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 2, quizDone: false, interactZone: { x: 1960, y: 400, w: 100, h: 80 } },
+            { x: 2600, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 3, quizDone: false, interactZone: { x: 2560, y: 400, w: 100, h: 80 } },
+            { x: 3300, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 4, quizDone: false, interactZone: { x: 3260, y: 400, w: 100, h: 80 } }
+        ],
+        finishGate: null, // Gate tidak ada, diganti bos fight
+        hasBoss: true,
+        bossArena: { x: 3600, width: 1400 } // Kamera akan dikunci di sini
     };
 }
 
@@ -136,8 +163,17 @@ export class Level { // class manajer level dan renderer
     }
 
     load(levelNumber) { // muat data level berdasarkan nomor
+        this.levelNumber = levelNumber;
         switch (levelNumber) {
             case 1:
+                this.data = createLevel1();
+                break;
+            case 2:
+                this.data = createLevel2();
+                break;
+            case 3:
+                this.data = createLevel3();
+                break;
             default:
                 this.data = createLevel1();
                 break;
@@ -194,7 +230,7 @@ export class Level { // class manajer level dan renderer
     }
 
     getQuiz(index) {
-        return QUIZ_DATA[index] || QUIZ_DATA[0];
+        return this.data.quizData[index] || this.data.quizData[0];
     }
 
     spawnParticles(x, y, color, count) {

@@ -10,6 +10,7 @@ export class UIManager { // class untuk mengatur interaksi DOM dan HTML UI
             winScreen: document.getElementById('win-screen'),
 
             hud: document.getElementById('hud'),
+            levelValue: document.getElementById('level-value'),
             scoreValue: document.getElementById('score-value'),
             barsValue: document.getElementById('bars-value'),
             gravityArrow: document.getElementById('gravity-arrow'),
@@ -23,6 +24,7 @@ export class UIManager { // class untuk mengatur interaksi DOM dan HTML UI
             wartaText: document.getElementById('warta-text'),
 
             quizModal: document.getElementById('quiz-modal'),
+            quizNpcName: document.querySelector('.quiz-npc-label span:last-child'),
             quizQuestion: document.getElementById('quiz-question'),
             quizOptions: document.getElementById('quiz-options'),
             quizFeedback: document.getElementById('quiz-feedback'),
@@ -118,9 +120,12 @@ export class UIManager { // class untuk mengatur interaksi DOM dan HTML UI
         this.elements.hud.classList.add('hidden');
     }
 
-    updateHUD(score, bars, totalBars) { // update text di pojok kiri atas
+    updateHUD(score, bars, totalBars, currentLevel) { // update text di pojok kiri atas
         this.elements.scoreValue.textContent = score;
         this.elements.barsValue.textContent = `${bars} / ${totalBars}`;
+        if (this.elements.levelValue && currentLevel) {
+            this.elements.levelValue.textContent = `Level ${currentLevel}`;
+        }
     }
 
     showMission(text) {
@@ -159,6 +164,11 @@ export class UIManager { // class untuk mengatur interaksi DOM dan HTML UI
     showQuiz(quizData, callback) { // generate tombol kuis dinamis dari data
         this._quizCallback = callback;
         this._quizResult = false;
+
+        // Variasi nama NPC
+        if (this.elements.quizNpcName) {
+            this.elements.quizNpcName.textContent = Math.random() > 0.5 ? 'Cak Sura' : 'Cak Baya';
+        }
 
         this.elements.quizQuestion.textContent = quizData.question;
 

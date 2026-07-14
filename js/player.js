@@ -10,6 +10,7 @@ export class Player { // class entitas utama yang dikendalikan pemain
     constructor(x, y) {
         this.x = x;
         this.y = y;
+        this.name = "Galuh";
         this.w = 24; // lebar hitbox
         this.h = 32; // tinggi hitbox
 
@@ -116,8 +117,9 @@ export class Player { // class entitas utama yang dikendalikan pemain
         this.gravityDir = 1;
         this.grounded = false;
         this.facingRight = true;
+        this.facingRight = true;
         this.alive = true;
-        this.score = 0;
+        // this.score = 0; // Score tidak di-reset otomatis agar terbawa ke level selanjutnya
         this.barsCollected = 0;
         this.quizCorrect = 0;
         this.jumpCount = 0;

@@ -5,8 +5,17 @@ import { Player } from './player.js';
 import { Level } from './level.js';
 import { UIManager } from './ui.js';
 import { checkAABB } from './physics.js';
+import { SuboAI } from './boss.js';
 
 const STATE = { // state game saat ini
+    MENU: 'MENU',
+    PLAYING: 'PLAYING',
+    WARTA: 'WARTA', // popup edukasi
+    QUIZ: 'QUIZ', // modal kuis
+    BOSS_FIGHT: 'BOSS_FIGHT', // state saat lawan subo
+    GAME_OVER: 'GAME_OVER',
+    WIN: 'WIN'
+};
     MENU: 'MENU',
     PLAYING: 'PLAYING',
     WARTA: 'WARTA', // popup edukasi
@@ -46,6 +55,9 @@ class Game { // class utama yang mengatur game loop dan logic
         this.player = new Player(80, 400);
 
         this.state = STATE.MENU;
+        this.currentLevel = 1;
+        this.boss = null;
+        
         this.lastTime = 0;
         this.accumulator = 0;
         this.fixedDt = 1000 / 60; // 60 FPS target
@@ -64,24 +76,32 @@ class Game { // class utama yang mengatur game loop dan logic
     }
 
     _bindUICallbacks() {
-        this.ui.onStartGame(() => this.startGame());
-        this.ui.onRetry(() => this.startGame());
+        this.ui.onStartGame(() => this.startGame(1));
+        this.ui.onRetry(() => this.startGame(this.currentLevel));
         this.ui.onBackToMenu(() => this.goToMenu());
     }
 
-    startGame() { // inisialisasi level dan mulai bermain
-        this.level.load(1);
+    startGame(levelNumber = 1) { // inisialisasi level dan mulai bermain
+        if (levelNumber === 1) {
+            this.player.score = 0; // Reset score cuma dari level 1
+        }
+        this.currentLevel = levelNumber;
+        this.level.load(this.currentLevel);
 
         const spawn = this.level.data.playerSpawn;
         this.player.spawnX = spawn.x;
         this.player.spawnY = spawn.y;
         this.player.reset();
+        
+        // Bersihkan data boss state lama
+        this.boss = null;
+        this.player.quizCorrect = 0; // Reset counter quiz per level
 
         this.camera.x = 0;
 
         this.ui.hideMenu();
         this.ui.showHUD();
-        this.ui.updateHUD(0, 0, this.level.data.requiredBars, 1);
+        this.ui.updateHUD(this.player.score, 0, this.level.data.requiredBars, this.currentLevel);
         this.ui.showMission(this.level.data.mission);
         this.ui.hideNPCPrompt();
 
@@ -114,17 +134,63 @@ class Game { // class utama yang mengatur game loop dan logic
     }
 
     update() { // update semua objek game (player, level, dll)
-        if (this.state !== STATE.PLAYING) {
+        if (this.state !== STATE.PLAYING && this.state !== STATE.BOSS_FIGHT) {
             this.input.clearJustPressed();
             return;
         }
 
         this.player.update(this.input, this.level.data.platforms);
-
         this.level.update();
 
-        const events = this.level.checkInteractions(this.player);
-        this._handleEvents(events);
+        // Cek spawn Boss di level 3
+        if (this.state === STATE.PLAYING && this.level.data.hasBoss && this.player.quizCorrect >= 5 && !this.boss) {
+            this.boss = new SuboAI(4600, 300);
+            this.state = STATE.BOSS_FIGHT;
+            this.ui.showMission("KALAHKAN SUBO!");
+        }
+
+        // Update Boss
+        if (this.state === STATE.BOSS_FIGHT && this.boss) {
+            this.boss.update(this.player, this.level.data.platforms);
+            
+            // Kunci kamera di arena boss
+            const arena = this.level.data.bossArena;
+            this.camera.x = arena.x;
+            if (this.player.x < arena.x) this.player.x = arena.x;
+            if (this.player.x > arena.x + arena.width - this.player.w) this.player.x = arena.x + arena.width - this.player.w;
+            
+            // Hit detection boss
+            if (checkAABB(this.player, this.boss)) {
+                // Injak bos (jika player falling)
+                if (this.player.vy > 0 && this.player.y + this.player.h < this.boss.y + 20) {
+                    this.player.vy = -12; // Bounce back
+                    if (this.boss.takeDamage()) {
+                        this.player.score += 500;
+                        if (this.boss.hp <= 0) {
+                            this.state = STATE.WIN;
+                            this.player.score += 2000;
+                            this.ui.showWin(this.player.score, this.player.barsCollected, this.level.data.requiredBars);
+                            this._saveHighScore(this.player.score);
+                            return;
+                        }
+                    }
+                } else {
+                    // Player kena damage boss (game over hardcore)
+                    if (!this.boss.invulnerable) {
+                        this.player.alive = false;
+                        this.state = STATE.GAME_OVER;
+                        this.ui.showGameOver(this.player.score);
+                        this.currentLevel = 1; // Hukuman kembali ke level 1
+                        return;
+                    }
+                }
+            }
+        }
+
+        if (this.state === STATE.PLAYING) {
+            const events = this.level.checkInteractions(this.player);
+            this._handleEvents(events);
+        }
 
         if (this._nearNPC && !this._nearNPC.quizDone) {
             this.ui.showNPCPrompt();
@@ -137,12 +203,15 @@ class Game { // class utama yang mengatur game loop dan logic
 
         this._nearNPC = null;
 
-        this.camera.follow(this.player, this.level.data.width);
+        if (this.state !== STATE.BOSS_FIGHT) {
+            this.camera.follow(this.player, this.level.data.width);
+        }
 
         this.ui.updateHUD(
             this.player.score, 
             this.player.barsCollected, 
-            this.level.data.requiredBars
+            this.level.data.requiredBars,
+            this.currentLevel
         );
 
         this.input.clearJustPressed();
@@ -176,15 +245,14 @@ class Game { // class utama yang mengatur game loop dan logic
                     break;
 
                 case 'reach_finish':
-
-                    this.state = STATE.WIN;
-                    this.player.score += 300; // Bonus finish
-                    this.ui.showWin(
-                        this.player.score, 
-                        this.player.barsCollected, 
-                        this.level.data.requiredBars
-                    );
-                    this._saveHighScore(this.player.score);
+                    if (this.currentLevel < 3) {
+                        this.player.score += 300; // Bonus stage clear
+                        this.startGame(this.currentLevel + 1);
+                    } else {
+                        // Harusnya tidak sampai sini di Level 3 (karena lawan boss)
+                        this.state = STATE.WIN;
+                        this.ui.showWin(this.player.score, this.player.barsCollected, this.level.data.requiredBars);
+                    }
                     return;
 
                 case 'fell_off':
@@ -207,6 +275,8 @@ class Game { // class utama yang mengatur game loop dan logic
             if (wasCorrect) {
                 this.player.score += 200;
                 this.player.quizCorrect++;
+            } else {
+                this.player.score -= 200; // Penalti jawaban salah
             }
             this.state = STATE.PLAYING;
         });
@@ -236,6 +306,10 @@ class Game { // class utama yang mengatur game loop dan logic
 
         if (this.player.alive) {
             this.player.draw(ctx, camX);
+        }
+
+        if (this.boss && (this.state === STATE.BOSS_FIGHT || this.state === STATE.WIN)) {
+            this.boss.draw(ctx, camX);
         }
 
         if (this.state === STATE.WARTA || this.state === STATE.QUIZ) {
