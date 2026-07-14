@@ -16,13 +16,6 @@ const STATE = { // state game saat ini
     GAME_OVER: 'GAME_OVER',
     WIN: 'WIN'
 };
-    MENU: 'MENU',
-    PLAYING: 'PLAYING',
-    WARTA: 'WARTA', // popup edukasi
-    QUIZ: 'QUIZ', // modal kuis
-    GAME_OVER: 'GAME_OVER',
-    WIN: 'WIN'
-};
 
 class Camera { // class untuk pergerakan kamera mengikuti player
     constructor(canvasWidth, canvasHeight) {

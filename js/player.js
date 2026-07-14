@@ -117,7 +117,6 @@ export class Player { // class entitas utama yang dikendalikan pemain
         this.gravityDir = 1;
         this.grounded = false;
         this.facingRight = true;
-        this.facingRight = true;
         this.alive = true;
         // this.score = 0; // Score tidak di-reset otomatis agar terbawa ke level selanjutnya
         this.barsCollected = 0;
