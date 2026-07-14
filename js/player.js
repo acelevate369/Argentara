@@ -33,6 +33,18 @@ export class Player { // class entitas utama yang dikendalikan pemain
         this.jumpCount = 0;
 
         this.animTimer = 0;
+        
+        // Mekanik Tempur
+        this.isAttacking = false;
+        this.attackTimer = 0;
+        this.attackHitbox = null;
+        
+        this.isDashing = false;
+        this.dashTimer = 0;
+        this.isInvulnerable = false;
+        
+        this.isHeavyAttacking = false;
+        this.heavyTimer = 0;
     }
 
     update(input, platforms) { // proses fisika dan input tiap frame
@@ -67,12 +79,71 @@ export class Player { // class entitas utama yang dikendalikan pemain
 
         this.vy = Math.min(this.vy, MAX_FALL_SPEED);
 
+        // Update Combat Timers
+        if (this.isAttacking) {
+            this.attackTimer--;
+            if (this.attackTimer <= 0) {
+                this.isAttacking = false;
+                this.attackHitbox = null;
+            }
+        }
+        
+        if (this.isDashing) {
+            this.dashTimer--;
+            this.vx = this.facingRight ? 8 : -8; // Kecepatan dash
+            this.vy = 0; // Freeze gravity during dash
+            if (this.dashTimer <= 0) {
+                this.isDashing = false;
+                this.isInvulnerable = false;
+            }
+        }
+        
+        if (this.isHeavyAttacking) {
+            this.heavyTimer--;
+            this.vx = 0; // Stop moving
+            if (this.heavyTimer <= 0) {
+                this.isHeavyAttacking = false;
+                this.attackHitbox = null;
+            }
+        }
+
+        // Combat Inputs
+        if (!this.isDashing && !this.isHeavyAttacking && !this.isAttacking) {
+            if (input.isJustPressed('KeyJ')) { // Sabetan Warta
+                this.isAttacking = true;
+                this.attackTimer = 15; // frames (approx 250ms)
+                this._createHitbox(40, 20, 10);
+            } else if (input.isJustPressed('ShiftLeft') && this.score >= 20) { // Dash
+                this.score -= 20;
+                this.isDashing = true;
+                this.isInvulnerable = true;
+                this.dashTimer = 10; // frames
+            } else if (input.isJustPressed('KeyK') && this.score >= 50) { // Heavy Attack
+                this.score -= 50;
+                this.isHeavyAttacking = true;
+                this.heavyTimer = 30; // frames
+                this._createHitbox(80, 20, 40, true);
+            }
+        }
+
         resolveCollisions(this, platforms); // panggil engine fisika AABB
 
         if (this.grounded) {
             this.jumpCount = 0; // reset jatah lompat
         }
         this.animTimer++;
+    }
+
+    _createHitbox(w, h, damage, isHeavy = false) {
+        const offset = this.facingRight ? this.w : -w;
+        this.attackHitbox = {
+            x: this.x + offset,
+            y: this.y + (this.h - h) / 2,
+            w: w,
+            h: h,
+            damage: damage,
+            isHeavy: isHeavy
+        };
     }
 
     draw(ctx, camX) { // render kotak karakter ke canvas
@@ -106,7 +177,26 @@ export class Player { // class entitas utama yang dikendalikan pemain
             ctx.globalAlpha = 1;
         }
 
+        if (this.isInvulnerable) {
+            // Aura dash
+            ctx.fillStyle = 'rgba(60, 220, 124, 0.5)';
+            ctx.fillRect(drawX - 5, drawY - 5, this.w + 10, this.h + 10);
+        }
+
+        if (this.isHeavyAttacking) {
+            ctx.fillStyle = '#ffaa00';
+            ctx.fillRect(drawX, drawY, this.w, this.h); // visual feedback
+        }
+
         ctx.restore();
+        
+        // Gambar Attack Hitbox untuk debug/visual
+        if (this.attackHitbox) {
+            const hx = this.attackHitbox.x - camX;
+            const hy = this.attackHitbox.y;
+            ctx.fillStyle = this.attackHitbox.isHeavy ? 'rgba(255, 68, 85, 0.7)' : 'rgba(255, 255, 255, 0.7)';
+            ctx.fillRect(hx, hy, this.attackHitbox.w, this.attackHitbox.h);
+        }
     }
 
     reset() { // kembalikan ke titik awal saat retry / mulai baru

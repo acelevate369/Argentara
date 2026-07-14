@@ -55,6 +55,9 @@ class Game { // class utama yang mengatur game loop dan logic
         this.accumulator = 0;
         this.fixedDt = 1000 / 60; // 60 FPS target
 
+        this.hitStopTimer = 0;
+        this.shakeTimer = 0;
+
         this._nearNPC = null;
 
         this.unlockedLevel = parseInt(localStorage.getItem('argentara_unlocked_level') || '1');
@@ -153,42 +156,66 @@ class Game { // class utama yang mengatur game loop dan logic
         this.player.update(this.input, this.level.data.platforms);
         this.level.update();
 
-        // Cek spawn Boss di level 3
+        // Check spawn Boss di level 3
         if (this.state === STATE.PLAYING && this.level.data.hasBoss && this.player.quizCorrect >= 5 && !this.boss) {
-            this.boss = new SuboAI(4600, 300);
+            this.boss = new SuboAI(4000, 300); // Tepat di tengah arena
             this.state = STATE.BOSS_FIGHT;
-            this.ui.showMission("KALAHKAN SUBO!");
+            this.ui.showMission("KALAHKAN SUBO! HP: 1000");
         }
 
-        // Update Boss
-        if (this.state === STATE.BOSS_FIGHT && this.boss) {
+        // Update Boss & Hitstop
+        if (this.hitStopTimer > 0) {
+            this.hitStopTimer -= safeDelta;
+        } else if (this.state === STATE.BOSS_FIGHT && this.boss) {
             this.boss.update(this.player, this.level.data.platforms);
             
+            // Kamera shake
+            if (this.shakeTimer > 0) {
+                this.shakeTimer -= safeDelta;
+            }
+
             // Kunci kamera di arena boss
             const arena = this.level.data.bossArena;
             this.camera.x = arena.x;
             if (this.player.x < arena.x) this.player.x = arena.x;
             if (this.player.x > arena.x + arena.width - this.player.w) this.player.x = arena.x + arena.width - this.player.w;
             
-            // Hit detection boss
-            if (checkAABB(this.player, this.boss)) {
-                // Injak bos (jika player falling)
-                if (this.player.vy > 0 && this.player.y + this.player.h < this.boss.y + 20) {
-                    this.player.vy = -12; // Bounce back
-                    if (this.boss.takeDamage()) {
-                        this.player.score += 500;
+            // Update UI HP Boss
+            this.ui.elements.missionText.textContent = `KALAHKAN SUBO! HP: ${this.boss.hp}`;
+
+            // Player menyerang boss
+            if (this.player.attackHitbox && checkAABB(this.player.attackHitbox, this.boss)) {
+                // Jangan double hit per attack
+                if (!this.player.attackHitbox.hasHit) {
+                    this.player.attackHitbox.hasHit = true; // flag agar tak multiple hit
+                    let isFrontal = (this.player.facingRight && this.boss.x > this.player.x) || (!this.player.facingRight && this.boss.x < this.player.x);
+                    
+                    let dmgResult = this.boss.takeDamage(this.player.attackHitbox.damage, isFrontal, this.player.attackHitbox.isHeavy);
+                    
+                    if (dmgResult === 'DEFLECT') {
+                        this.hitStopTimer = 100;
+                        this.player.vx = this.player.facingRight ? -300 : 300; // Knockback besar
+                    } else if (dmgResult === true) {
+                        this.hitStopTimer = this.player.attackHitbox.isHeavy ? 150 : 50;
+                        this.shakeTimer = this.player.attackHitbox.isHeavy ? 200 : 0;
+                        
                         if (this.boss.hp <= 0) {
                             this.state = STATE.WIN;
                             this.player.score += 2000;
-                            this._unlockNextLevel(4); // Sudah tamat
+                            this._unlockNextLevel(4); 
                             this.ui.showWin(this.player.score, this.player.barsCollected, this.level.data.requiredBars);
                             this._saveHighScore(this.player.score);
                             return;
                         }
                     }
-                } else {
-                    // Player kena damage boss (game over hardcore)
-                    if (!this.boss.invulnerable) {
+                }
+            }
+            
+            // Boss menyerang player
+            if (!this.player.isInvulnerable && this.player.alive) {
+                let bossBoxes = this.boss.getHitboxes();
+                for (let box of bossBoxes) {
+                    if (checkAABB(this.player, box)) {
                         this.player.alive = false;
                         this.state = STATE.GAME_OVER;
                         this.ui.showGameOver(this.player.score, "Dihancurkan oleh Subo!");
@@ -322,6 +349,14 @@ class Game { // class utama yang mengatur game loop dan logic
             return;
         }
 
+        ctx.save();
+        if (this.shakeTimer > 0) {
+            const mag = 4;
+            const rx = (Math.random() - 0.5) * mag;
+            const ry = (Math.random() - 0.5) * mag;
+            ctx.translate(rx, ry);
+        }
+
         this.level.draw(ctx, camX, this.canvas.width, this.canvas.height);
 
         if (this.player.alive) {
@@ -331,6 +366,8 @@ class Game { // class utama yang mengatur game loop dan logic
         if (this.boss && (this.state === STATE.BOSS_FIGHT || this.state === STATE.WIN)) {
             this.boss.draw(ctx, camX);
         }
+
+        ctx.restore();
 
         if (this.state === STATE.WARTA || this.state === STATE.QUIZ) {
 

@@ -16,39 +16,41 @@ function createLevel1() { // generate data statis untuk level 1
         platforms: [
             { x: 0, y: 480, w: 1000, h: 60, type: 'ground' },
             { x: 1200, y: 480, w: 1000, h: 60, type: 'ground' },
-            { x: 2400, y: 480, w: 1000, h: 60, type: 'ground' },
-            { x: 3600, y: 480, w: 1200, h: 60, type: 'ground' },
+            { x: 2350, y: 480, w: 1000, h: 60, type: 'ground' },
+            { x: 3500, y: 480, w: 1300, h: 60, type: 'ground' },
             
-            { x: 400, y: 410, w: 128, h: 20, type: 'solar' },
-            { x: 700, y: 350, w: 128, h: 20, type: 'solar' },
-            { x: 1050, y: 350, w: 128, h: 20, type: 'solar' },
-            { x: 1600, y: 400, w: 128, h: 20, type: 'solar' },
-            { x: 2200, y: 420, w: 128, h: 20, type: 'solar' },
-            { x: 2800, y: 380, w: 128, h: 20, type: 'solar' },
-            { x: 3300, y: 320, w: 128, h: 20, type: 'solar' }
+            { x: 400, y: 390, w: 128, h: 20, type: 'solar' },
+            { x: 650, y: 310, w: 128, h: 20, type: 'solar' },
+            { x: 900, y: 390, w: 128, h: 20, type: 'solar' },
+            { x: 1400, y: 390, w: 128, h: 20, type: 'solar' },
+            { x: 1650, y: 310, w: 128, h: 20, type: 'solar' },
+            { x: 1900, y: 230, w: 128, h: 20, type: 'solar' },
+            { x: 2600, y: 390, w: 128, h: 20, type: 'solar' },
+            { x: 2850, y: 310, w: 128, h: 20, type: 'solar' },
+            { x: 3100, y: 390, w: 128, h: 20, type: 'solar' }
         ],
         collectibles: [
-            { x: 450, y: 380, w: 20, h: 16, type: 'silver', collected: false },
-            { x: 1650, y: 370, w: 20, h: 16, type: 'silver', collected: false },
-            { x: 2250, y: 390, w: 20, h: 16, type: 'silver', collected: false },
-            { x: 3350, y: 290, w: 20, h: 16, type: 'silver', collected: false },
+            { x: 450, y: 360, w: 20, h: 16, type: 'silver', collected: false },
+            { x: 1700, y: 280, w: 20, h: 16, type: 'silver', collected: false },
+            { x: 2650, y: 360, w: 20, h: 16, type: 'silver', collected: false },
+            { x: 3150, y: 360, w: 20, h: 16, type: 'silver', collected: false },
             
-            { x: 750, y: 320, w: 20, h: 20, type: 'warta', collected: false, factIndex: 0 },
-            { x: 1100, y: 320, w: 20, h: 20, type: 'warta', collected: false, factIndex: 1 },
-            { x: 2000, y: 450, w: 20, h: 20, type: 'warta', collected: false, factIndex: 2 },
-            { x: 2900, y: 350, w: 20, h: 20, type: 'warta', collected: false, factIndex: 3 },
-            { x: 3800, y: 450, w: 20, h: 20, type: 'warta', collected: false, factIndex: 4 }
+            { x: 700, y: 280, w: 20, h: 20, type: 'warta', collected: false, factIndex: 0 },
+            { x: 950, y: 360, w: 20, h: 20, type: 'warta', collected: false, factIndex: 1 },
+            { x: 1950, y: 200, w: 20, h: 20, type: 'warta', collected: false, factIndex: 2 },
+            { x: 2900, y: 280, w: 20, h: 20, type: 'warta', collected: false, factIndex: 3 },
+            { x: 3900, y: 450, w: 20, h: 20, type: 'warta', collected: false, factIndex: 4 }
         ],
         hazards: [
-            { x: 1050, y: 456, w: 80, h: 24, type: 'electric_floor' },
-            { x: 2300, y: 456, w: 80, h: 24, type: 'electric_floor' },
-            { x: 3450, y: 456, w: 80, h: 24, type: 'electric_floor' }
+            { x: 1050, y: 456, w: 100, h: 24, type: 'electric_floor' },
+            { x: 2230, y: 456, w: 120, h: 24, type: 'electric_floor' },
+            { x: 3370, y: 456, w: 130, h: 24, type: 'electric_floor' }
         ],
         npcs: [
             { x: 600, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 0, quizDone: false, interactZone: { x: 560, y: 400, w: 100, h: 80 } },
-            { x: 1400, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 1, quizDone: false, interactZone: { x: 1360, y: 400, w: 100, h: 80 } },
+            { x: 1500, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 1, quizDone: false, interactZone: { x: 1460, y: 400, w: 100, h: 80 } },
             { x: 2100, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 2, quizDone: false, interactZone: { x: 2060, y: 400, w: 100, h: 80 } },
-            { x: 3100, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 3, quizDone: false, interactZone: { x: 3060, y: 400, w: 100, h: 80 } },
+            { x: 2800, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 3, quizDone: false, interactZone: { x: 2760, y: 400, w: 100, h: 80 } },
             { x: 4200, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 4, quizDone: false, interactZone: { x: 4160, y: 400, w: 100, h: 80 } }
         ],
         finishGate: { x: 4600, y: 380, w: 80, h: 100 },
@@ -67,36 +69,36 @@ function createLevel2() { // generate data statis untuk level 2
         quizData: QUIZ_MEDIUM,
         platforms: [
             { x: 0, y: 480, w: 800, h: 60, type: 'ground' },
-            { x: 1000, y: 480, w: 500, h: 60, type: 'ground' },
-            { x: 1800, y: 480, w: 800, h: 60, type: 'ground' },
-            { x: 2900, y: 480, w: 600, h: 60, type: 'ground' },
+            { x: 950, y: 480, w: 700, h: 60, type: 'ground' },
+            { x: 1800, y: 480, w: 900, h: 60, type: 'ground' },
+            { x: 2850, y: 480, w: 800, h: 60, type: 'ground' },
             { x: 3800, y: 480, w: 1200, h: 60, type: 'ground' },
             
-            { x: 300, y: 380, w: 100, h: 20, type: 'solar' },
-            { x: 600, y: 300, w: 100, h: 20, type: 'solar' },
-            { x: 850, y: 250, w: 100, h: 20, type: 'solar' },
-            { x: 1600, y: 380, w: 100, h: 20, type: 'solar' },
-            { x: 2200, y: 320, w: 100, h: 20, type: 'solar' },
-            { x: 2650, y: 280, w: 100, h: 20, type: 'solar' },
-            { x: 3550, y: 350, w: 100, h: 20, type: 'solar' }
+            { x: 300, y: 390, w: 100, h: 20, type: 'solar' },
+            { x: 550, y: 310, w: 100, h: 20, type: 'solar' },
+            { x: 800, y: 230, w: 100, h: 20, type: 'solar' },
+            { x: 1600, y: 390, w: 100, h: 20, type: 'solar' },
+            { x: 2200, y: 350, w: 100, h: 20, type: 'solar' },
+            { x: 2600, y: 270, w: 100, h: 20, type: 'solar' },
+            { x: 3450, y: 390, w: 100, h: 20, type: 'solar' }
         ],
         collectibles: [
-            { x: 640, y: 270, w: 20, h: 16, type: 'silver', collected: false },
-            { x: 1640, y: 350, w: 20, h: 16, type: 'silver', collected: false },
-            { x: 2240, y: 290, w: 20, h: 16, type: 'silver', collected: false },
-            { x: 2690, y: 250, w: 20, h: 16, type: 'silver', collected: false },
-            { x: 3590, y: 320, w: 20, h: 16, type: 'silver', collected: false },
+            { x: 600, y: 280, w: 20, h: 16, type: 'silver', collected: false },
+            { x: 1640, y: 360, w: 20, h: 16, type: 'silver', collected: false },
+            { x: 2240, y: 320, w: 20, h: 16, type: 'silver', collected: false },
+            { x: 2640, y: 240, w: 20, h: 16, type: 'silver', collected: false },
+            { x: 3490, y: 360, w: 20, h: 16, type: 'silver', collected: false },
             
-            { x: 340, y: 350, w: 20, h: 20, type: 'warta', collected: false, factIndex: 0 },
-            { x: 890, y: 220, w: 20, h: 20, type: 'warta', collected: false, factIndex: 1 },
+            { x: 340, y: 360, w: 20, h: 20, type: 'warta', collected: false, factIndex: 0 },
+            { x: 840, y: 200, w: 20, h: 20, type: 'warta', collected: false, factIndex: 1 },
             { x: 1900, y: 450, w: 20, h: 20, type: 'warta', collected: false, factIndex: 2 },
             { x: 3100, y: 450, w: 20, h: 20, type: 'warta', collected: false, factIndex: 3 },
             { x: 4000, y: 450, w: 20, h: 20, type: 'warta', collected: false, factIndex: 4 }
         ],
         hazards: [
-            { x: 1100, y: 456, w: 100, h: 24, type: 'electric_floor' },
-            { x: 2000, y: 456, w: 100, h: 24, type: 'electric_floor' },
-            { x: 3000, y: 456, w: 150, h: 24, type: 'electric_floor' }
+            { x: 1050, y: 456, w: 120, h: 24, type: 'electric_floor' },
+            { x: 2000, y: 456, w: 120, h: 24, type: 'electric_floor' },
+            { x: 3000, y: 456, w: 120, h: 24, type: 'electric_floor' }
         ],
         npcs: [
             { x: 1300, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 0, quizDone: false, interactZone: { x: 1260, y: 400, w: 100, h: 80 } },
@@ -125,17 +127,25 @@ function createLevel3() { // generate data statis untuk level 3 (Boss Level)
             { x: 2200, y: 480, w: 800, h: 60, type: 'ground' },
             { x: 3200, y: 480, w: 1800, h: 60, type: 'ground' }, // Boss arena panjang
             
-            { x: 400, y: 380, w: 80, h: 20, type: 'solar' },
-            { x: 700, y: 280, w: 80, h: 20, type: 'solar' },
-            { x: 1050, y: 350, w: 80, h: 20, type: 'solar' },
-            { x: 1800, y: 350, w: 80, h: 20, type: 'solar' },
-            { x: 2100, y: 250, w: 80, h: 20, type: 'solar' }
+            { x: 400, y: 390, w: 80, h: 20, type: 'solar' },
+            { x: 700, y: 310, w: 80, h: 20, type: 'solar' },
+            { x: 1050, y: 390, w: 80, h: 20, type: 'solar' },
+            { x: 1800, y: 390, w: 80, h: 20, type: 'solar' },
+            { x: 2100, y: 310, w: 80, h: 20, type: 'solar' },
+            
+            // Boss Arena Platforms (X starts at 3600, Canvas W 960)
+            // Left Platform
+            { x: 3700, y: 370, w: 150, h: 20, type: 'solar' },
+            // Center Platform
+            { x: 4000, y: 270, w: 150, h: 20, type: 'solar' },
+            // Right Platform
+            { x: 4300, y: 370, w: 150, h: 20, type: 'solar' }
         ],
         collectibles: [
-            { x: 430, y: 350, w: 20, h: 20, type: 'warta', collected: false, factIndex: 0 },
-            { x: 730, y: 250, w: 20, h: 20, type: 'warta', collected: false, factIndex: 1 },
+            { x: 430, y: 360, w: 20, h: 20, type: 'warta', collected: false, factIndex: 0 },
+            { x: 730, y: 280, w: 20, h: 20, type: 'warta', collected: false, factIndex: 1 },
             { x: 1400, y: 450, w: 20, h: 20, type: 'warta', collected: false, factIndex: 2 },
-            { x: 2130, y: 220, w: 20, h: 20, type: 'warta', collected: false, factIndex: 3 },
+            { x: 2130, y: 280, w: 20, h: 20, type: 'warta', collected: false, factIndex: 3 },
             { x: 2800, y: 450, w: 20, h: 20, type: 'warta', collected: false, factIndex: 4 }
         ],
         hazards: [
@@ -151,7 +161,7 @@ function createLevel3() { // generate data statis untuk level 3 (Boss Level)
         ],
         finishGate: null, // Gate tidak ada, diganti bos fight
         hasBoss: true,
-        bossArena: { x: 3600, width: 1400 } // Kamera akan dikunci di sini
+        bossArena: { x: 3600, width: 960 } // Kamera akan dikunci di sini sesuai resolusi 960x540
     };
 }
 
