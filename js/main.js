@@ -57,6 +57,8 @@ class Game { // class utama yang mengatur game loop dan logic
 
         this._nearNPC = null;
 
+        this.unlockedLevel = parseInt(localStorage.getItem('argentara_unlocked_level') || '1');
+
         this._bindUICallbacks();
 
         this.highScore = parseInt(localStorage.getItem('argentara_highscore') || '0');
@@ -72,12 +74,28 @@ class Game { // class utama yang mengatur game loop dan logic
         this.ui.onStartGame(() => this.startGame(1));
         this.ui.onRetry(() => this.startGame(this.currentLevel));
         this.ui.onBackToMenu(() => this.goToMenu());
+        this.ui.onSelectLevel((action, levelNum) => {
+            if (action === 'show') {
+                document.querySelectorAll('.btn-level').forEach(btn => {
+                    const lNum = parseInt(btn.dataset.level);
+                    if (lNum <= this.unlockedLevel) {
+                        btn.classList.remove('btn-locked');
+                        btn.textContent = `LEVEL ${lNum}`;
+                    } else {
+                        btn.classList.add('btn-locked');
+                        btn.textContent = `LEVEL ${lNum} 🔒`;
+                    }
+                });
+                this.ui.elements.levelMenuScreen.classList.remove('hidden');
+            } else if (action === 'start') {
+                this.startGame(levelNum);
+            }
+        });
     }
 
     startGame(levelNumber = 1) { // inisialisasi level dan mulai bermain
-        if (levelNumber === 1) {
-            this.player.score = 0; // Reset score cuma dari level 1
-        }
+        this.player.score = 0; // Mulai main dari level berapapun selalu di-reset skornya agar tidak bisa farming
+        
         this.currentLevel = levelNumber;
         this.level.load(this.currentLevel);
 
@@ -162,6 +180,7 @@ class Game { // class utama yang mengatur game loop dan logic
                         if (this.boss.hp <= 0) {
                             this.state = STATE.WIN;
                             this.player.score += 2000;
+                            this._unlockNextLevel(4); // Sudah tamat
                             this.ui.showWin(this.player.score, this.player.barsCollected, this.level.data.requiredBars);
                             this._saveHighScore(this.player.score);
                             return;
@@ -172,7 +191,7 @@ class Game { // class utama yang mengatur game loop dan logic
                     if (!this.boss.invulnerable) {
                         this.player.alive = false;
                         this.state = STATE.GAME_OVER;
-                        this.ui.showGameOver(this.player.score);
+                        this.ui.showGameOver(this.player.score, "Dihancurkan oleh Subo!");
                         this.currentLevel = 1; // Hukuman kembali ke level 1
                         return;
                     }
@@ -229,7 +248,7 @@ class Game { // class utama yang mengatur game loop dan logic
 
                     this.player.alive = false;
                     this.state = STATE.GAME_OVER;
-                    this.ui.showGameOver(this.player.score);
+                    this.ui.showGameOver(this.player.score, "Tersengat Listrik/Tertusuk Paku!");
                     this._saveHighScore(this.player.score);
                     return;
 
@@ -240,6 +259,7 @@ class Game { // class utama yang mengatur game loop dan logic
                 case 'reach_finish':
                     if (this.currentLevel < 3) {
                         this.player.score += 300; // Bonus stage clear
+                        this._unlockNextLevel(this.currentLevel + 1);
                         this.startGame(this.currentLevel + 1);
                     } else {
                         // Harusnya tidak sampai sini di Level 3 (karena lawan boss)
@@ -252,10 +272,17 @@ class Game { // class utama yang mengatur game loop dan logic
 
                     this.player.alive = false;
                     this.state = STATE.GAME_OVER;
-                    this.ui.showGameOver(this.player.score);
+                    this.ui.showGameOver(this.player.score, "Jatuh ke Jurang Tanpa Dasar!");
                     this._saveHighScore(this.player.score);
                     return;
             }
+        }
+    }
+
+    _unlockNextLevel(levelNumber) {
+        if (levelNumber > this.unlockedLevel) {
+            this.unlockedLevel = levelNumber;
+            localStorage.setItem('argentara_unlocked_level', this.unlockedLevel.toString());
         }
     }
 

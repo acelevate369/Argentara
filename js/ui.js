@@ -6,7 +6,9 @@ export class UIManager { // class untuk mengatur interaksi DOM dan HTML UI
         this.elements = { // cache referensi elemen DOM
             menuScreen: document.getElementById('menu-screen'),
             aboutModal: document.getElementById('about-modal'),
+            levelMenuScreen: document.getElementById('level-menu-screen'),
             gameoverScreen: document.getElementById('gameover-screen'),
+            gameoverReason: document.getElementById('gameover-reason'),
             winScreen: document.getElementById('win-screen'),
 
             hud: document.getElementById('hud'),
@@ -42,6 +44,7 @@ export class UIManager { // class untuk mengatur interaksi DOM dan HTML UI
         this._onStartGame = null;
         this._onRetry = null;
         this._onBackToMenu = null;
+        this._onSelectLevel = null;
     }
 
     _bindButtons() { // pasang event listener ke semua tombol UI
@@ -63,6 +66,33 @@ export class UIManager { // class untuk mengatur interaksi DOM dan HTML UI
         document.getElementById('btn-close-about').addEventListener('click', () => {
             this.elements.aboutModal.classList.add('hidden');
             this.elements.menuScreen.classList.remove('hidden');
+        });
+
+        const btnLevelMenu = document.getElementById('btn-level-menu');
+        if (btnLevelMenu) {
+            btnLevelMenu.addEventListener('click', () => {
+                this.elements.menuScreen.classList.add('hidden');
+                if (this._onSelectLevel) this._onSelectLevel('show'); // delegate to main to update unlocked states
+            });
+        }
+
+        const btnCloseLevelMenu = document.getElementById('btn-close-level-menu');
+        if (btnCloseLevelMenu) {
+            btnCloseLevelMenu.addEventListener('click', () => {
+                this.elements.levelMenuScreen.classList.add('hidden');
+                this.elements.menuScreen.classList.remove('hidden');
+            });
+        }
+
+        // Event listener level buttons
+        document.querySelectorAll('.btn-level').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                if (e.target.classList.contains('btn-locked')) return;
+                
+                const levelNum = parseInt(e.target.dataset.level);
+                this.elements.levelMenuScreen.classList.add('hidden');
+                if (this._onSelectLevel) this._onSelectLevel('start', levelNum);
+            });
         });
 
         document.getElementById('btn-close-warta').addEventListener('click', () => {
@@ -215,7 +245,8 @@ export class UIManager { // class untuk mengatur interaksi DOM dan HTML UI
         this.elements.quizModal.classList.add('hidden');
     }
 
-    showGameOver(score) {
+    showGameOver(score, reason = 'Analisis Gagal!') {
+        this.elements.gameoverReason.textContent = reason;
         this.elements.gameoverScoreValue.textContent = score;
         this.elements.gameoverScreen.classList.remove('hidden');
     }
@@ -251,4 +282,5 @@ export class UIManager { // class untuk mengatur interaksi DOM dan HTML UI
     onStartGame(cb) { this._onStartGame = cb; }
     onRetry(cb) { this._onRetry = cb; }
     onBackToMenu(cb) { this._onBackToMenu = cb; }
+    onSelectLevel(cb) { this._onSelectLevel = cb; }
 }

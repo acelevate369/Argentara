@@ -227,6 +227,35 @@ html, body {
     vertical-align: middle;
 }
 
+.level-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.btn-level {
+    padding: 18px 24px;
+    background: rgba(10, 14, 26, 0.8);
+    border-color: var(--accent-teal);
+    color: var(--accent-teal);
+}
+.btn-level:hover:not(.btn-locked) {
+    background: rgba(43, 196, 196, 0.2);
+}
+
+.btn-locked {
+    border-color: var(--text-muted);
+    color: var(--text-muted);
+    background: rgba(10, 14, 26, 0.5);
+    cursor: not-allowed;
+}
+.btn-locked:hover {
+    transform: none;
+    filter: none;
+}
+
 .modal-box {
     background: var(--panel-bg);
     border: 3px solid var(--panel-border);

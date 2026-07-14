@@ -25,6 +25,7 @@
                 </div>
                 <div class="menu-buttons">
                     <button id="btn-start" class="btn-pixel btn-primary">MULAI MAIN</button>
+                    <button id="btn-level-menu" class="btn-pixel btn-primary">PILIH LEVEL</button>
                     <button id="btn-about" class="btn-pixel btn-secondary">TENTANG GAME</button>
                 </div>
                 <div class="menu-controls">
@@ -37,6 +38,19 @@
             
             <!-- BGM Audio Embed -->
             <audio id="bgm" src="https://opengameart.org/sites/default/files/8-bit%20Platformer%20Theme.mp3" loop autoplay></audio>
+        </div>
+
+        <div id="level-menu-screen" class="overlay hidden">
+            <div class="modal-box">
+                <h2>PILIH LEVEL</h2>
+                <p>Mainkan level yang sudah terbuka.</p>
+                <div class="level-buttons">
+                    <button id="btn-level-1" class="btn-pixel btn-level" data-level="1">LEVEL 1</button>
+                    <button id="btn-level-2" class="btn-pixel btn-level btn-locked" data-level="2">LEVEL 2 🔒</button>
+                    <button id="btn-level-3" class="btn-pixel btn-level btn-locked" data-level="3">LEVEL 3 🔒</button>
+                </div>
+                <button id="btn-close-level-menu" class="btn-pixel btn-secondary" style="margin-top: 20px;">KEMBALI KE MENU</button>
+            </div>
         </div>
 
         <div id="about-modal" class="overlay hidden">
@@ -120,7 +134,7 @@
         <div id="gameover-screen" class="overlay hidden">
             <div class="gameover-content">
                 <h2 class="gameover-title">GAME OVER</h2>
-                <p class="gameover-subtitle">Analisis Gagal!</p>
+                <p id="gameover-reason" class="gameover-subtitle">Analisis Gagal!</p>
                 <p class="gameover-score">Skor: <span id="gameover-score-value">0</span></p>
                 <div class="menu-buttons">
                     <button id="btn-retry" class="btn-pixel btn-primary">MULAI LAGI</button>
