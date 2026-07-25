@@ -53,6 +53,7 @@ export class UIManager { // class untuk mengatur interaksi DOM dan HTML UI
         this._onRetry = null;
         this._onBackToMenu = null;
         this._onSelectLevel = null;
+        this._onToggleDevMode = null;
         this._onResume = null;
         this._onPauseMenu = null;
 
@@ -170,7 +171,24 @@ export class UIManager { // class untuk mengatur interaksi DOM dan HTML UI
             window.gameSettings.sfxVolume = val;
         });
 
+        const btnSettings = document.getElementById('btn-settings');
+        if (btnSettings) {
+            btnSettings.addEventListener('click', () => {
+                alert('Fitur pengaturan belum tersedia.');
+            });
+        }
 
+        const btnDevMode = document.getElementById('btn-dev-mode');
+        if (btnDevMode) {
+            btnDevMode.addEventListener('click', () => {
+                if (this._onToggleDevMode) {
+                    const isDev = this._onToggleDevMode();
+                    btnDevMode.textContent = `DEV MODE: ${isDev ? 'ON' : 'OFF'}`;
+                    btnDevMode.style.borderColor = isDev ? '#3cdc7c' : '#ff4455';
+                    btnDevMode.style.color = isDev ? '#3cdc7c' : '#ff4455';
+                }
+            });
+        }
 
         const btnLevelMenu = document.getElementById('btn-level-menu');
         if (btnLevelMenu) {
@@ -494,6 +512,7 @@ export class UIManager { // class untuk mengatur interaksi DOM dan HTML UI
     onRetry(cb) { this._onRetry = cb; }
     onBackToMenu(cb) { this._onBackToMenu = cb; }
     onSelectLevel(cb) { this._onSelectLevel = cb; }
+    onToggleDevMode(cb) { this._onToggleDevMode = cb; }
     onResume(cb) { this._onResume = cb; }
     onPauseMenu(cb) { this._onPauseMenu = cb; }
 }
