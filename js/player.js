@@ -13,6 +13,9 @@ export class Player { // class entitas utama yang dikendalikan pemain
         this.name = "Galuh";
         this.w = 24; // lebar hitbox
         this.h = 32; // tinggi hitbox
+        
+        this.hp = 100;
+        this.maxHp = 100;
 
         this.vx = 0; // kecepatan sumbu X
         this.vy = 0; // kecepatan sumbu Y
@@ -45,10 +48,73 @@ export class Player { // class entitas utama yang dikendalikan pemain
         
         this.isHeavyAttacking = false;
         this.heavyTimer = 0;
+        this.hurtTimer = 0; // Timer untuk animasi hurt
+        this._invulTimer = 0; // Frame-based invulnerability timer
+        
+        // Load custom character sprites (1000x1000)
+        this.sprites = {
+            idle: [new Image(), new Image()],
+            walkRight: [new Image(), new Image()],
+            walkLeft: [new Image(), new Image()],
+            jump: [new Image(), new Image()]
+        };
+        this.sprites.idle[0].src = 'asset/utama/Idle 1.png';
+        this.sprites.idle[1].src = 'asset/utama/Idle 2.png';
+        this.sprites.walkRight[0].src = 'asset/utama/Walk kanan 1.png';
+        this.sprites.walkRight[1].src = 'asset/utama/Walk kanan 2.png';
+        this.sprites.walkLeft[0].src = 'asset/utama/Walk kiri 1.png';
+        this.sprites.walkLeft[1].src = 'asset/utama/Walk kiri 2.png';
+        this.sprites.jump[0].src = 'asset/utama/Jump 1.png';
+        this.sprites.jump[1].src = 'asset/utama/Jump 2.png';
+        
+        this.sprites.attackBasic = [];
+        const attackFrames = [13, 14, 17, 15, 16];
+        for (let i of attackFrames) {
+            let img = new Image();
+            img.src = `asset/utama/Basic Attack & Hurt/${i}.png`;
+            this.sprites.attackBasic.push(img);
+        }
+        
+        this.sprites.hurt = [];
+        const hurtFrames = [19, 20];
+        for (let i of hurtFrames) {
+            let img = new Image();
+            img.src = `asset/utama/Basic Attack & Hurt/${i}.png`;
+            this.sprites.hurt.push(img);
+        }
+
+        this.sprites.died = new Image();
+        this.sprites.died.src = 'asset/utama/Karakter_Utama_Died.png';
+
+        this.sprites.attackHeavy = [];
+        for (let i = 27; i <= 30; i++) {
+            let img = new Image();
+            img.src = `asset/utama/Heaavy Attack/${i}.png`;
+            this.sprites.attackHeavy.push(img);
+        }
+
+        // SFX
+        this.sfxBasicAttack = new Audio('asset/music & SFX/sfx/Galuh Basic Attack.mp3');
+        this.sfxBasicAttack.volume = 0.5;
+        this.sfxHeavyAttack = new Audio('asset/music & SFX/sfx/Heavy Attack Galuh.mp3');
+        this.sfxHeavyAttack.volume = 0.5;
     }
 
     update(input, platforms) { // proses fisika dan input tiap frame
-        if (!this.alive) return;
+        if (!this.alive) {
+            this.animTimer++;
+            this.vy += GRAVITY;
+            this.vx *= FRICTION; // Tambahkan gesekan agar mayatnya tidak meluncur tanpa batas ke luar layar
+            resolveCollisions(this, platforms);
+            return;
+        }
+        
+        if (typeof this.x !== 'number' || isNaN(this.x) || typeof this.y !== 'number' || isNaN(this.y)) {
+            this.x = this.spawnX || 80;
+            this.y = this.spawnY || 400;
+            this.vx = 0;
+            this.vy = 0;
+        }
 
         if (input.isPressed('ArrowLeft') || input.isPressed('KeyA')) {
             this.vx = -MOVE_SPEED;
@@ -78,6 +144,19 @@ export class Player { // class entitas utama yang dikendalikan pemain
         this.vy += GRAVITY;
 
         this.vy = Math.min(this.vy, MAX_FALL_SPEED);
+
+        // Update invulnerability timer (frame-based, bukan setTimeout)
+        if (this._invulTimer > 0) {
+            this._invulTimer--;
+            if (this._invulTimer <= 0) {
+                this.isInvulnerable = false;
+            }
+        }
+        
+        // Update hurt timer
+        if (this.hurtTimer > 0) {
+            this.hurtTimer--;
+        }
 
         // Update Combat Timers
         if (this.isAttacking) {
@@ -111,18 +190,26 @@ export class Player { // class entitas utama yang dikendalikan pemain
         if (!this.isDashing && !this.isHeavyAttacking && !this.isAttacking) {
             if (input.isJustPressed('KeyJ')) { // Sabetan Warta
                 this.isAttacking = true;
-                this.attackTimer = 15; // frames (approx 250ms)
+                this.attackTimer = 25; // frames (approx 416ms)
                 this._createHitbox(40, 20, 10);
+                this.sfxBasicAttack.volume = 0.5 * (window.gameSettings ? window.gameSettings.sfxVolume : 1.0);
+                this.sfxBasicAttack.currentTime = 0;
+                this.sfxBasicAttack.volume = 1.0 * (window.gameSettings ? window.gameSettings.sfxVolume : 1.0);
+                this.sfxBasicAttack.play().catch(e => console.log(e));
             } else if (input.isJustPressed('ShiftLeft') && this.score >= 20) { // Dash
                 this.score -= 20;
                 this.isDashing = true;
                 this.isInvulnerable = true;
-                this.dashTimer = 10; // frames
+                this.dashTimer = 15; // frames
             } else if (input.isJustPressed('KeyK') && this.score >= 50) { // Heavy Attack
                 this.score -= 50;
                 this.isHeavyAttacking = true;
                 this.heavyTimer = 30; // frames
-                this._createHitbox(80, 20, 40, true);
+                this._createHitbox(60, 40, 20, true);
+                this.sfxHeavyAttack.volume = 0.5 * (window.gameSettings ? window.gameSettings.sfxVolume : 1.0);
+                this.sfxHeavyAttack.currentTime = 0;
+                this.sfxHeavyAttack.volume = 1.0 * (window.gameSettings ? window.gameSettings.sfxVolume : 1.0);
+                this.sfxHeavyAttack.play().catch(e => console.log(e));
             }
         }
 
@@ -146,57 +233,112 @@ export class Player { // class entitas utama yang dikendalikan pemain
         };
     }
 
-    draw(ctx, camX) { // render kotak karakter ke canvas
+    draw(ctx, camX) { // render karakter ke canvas
         const drawX = this.x - camX;
         const drawY = this.y;
 
         ctx.save();
-
-        ctx.fillStyle = '#2ecc71';
-        ctx.fillRect(drawX, drawY, this.w, this.h);
-
-        ctx.fillStyle = '#1a8a4a';
-        ctx.fillRect(drawX + 2, drawY, this.w - 4, 10);
-
-        ctx.fillStyle = '#ffffff';
-        const eyeX = this.facingRight ? drawX + this.w - 10 : drawX + 4;
-        ctx.fillRect(eyeX, drawY + 4, 6, 4);
-
-        ctx.fillStyle = '#0a1a2a';
-        const pupilX = this.facingRight ? eyeX + 3 : eyeX + 1;
-        ctx.fillRect(pupilX, drawY + 5, 2, 2);
-
-        ctx.fillStyle = '#c0c8d4';
-        ctx.fillRect(drawX + 4, drawY + 18, this.w - 8, 3);
-
-        if (!this.grounded && this.jumpCount >= 2) {
-            ctx.globalAlpha = 0.4 + Math.sin(this.animTimer * 0.2) * 0.3;
-            ctx.strokeStyle = '#3cdc7c';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(drawX - 2, drawY - 2, this.w + 4, this.h + 4);
-            ctx.globalAlpha = 1;
+        
+        let img = null;
+        const isHurt = this.isInvulnerable && !this.isDashing;
+        let isOneDirectional = false;
+        
+        if (!this.alive) {
+            img = this.sprites.died; // Died is still a sprite sheet!
+            isOneDirectional = false; // TIDAK perlu flip canvas, karena sprite died sudah punya sisi kiri di row bawah!
+        } else if (this.isHeavyAttacking) {
+            let frameIdx = Math.floor(((30 - this.heavyTimer) / 30) * this.sprites.attackHeavy.length);
+            frameIdx = Math.min(this.sprites.attackHeavy.length - 1, Math.max(0, frameIdx));
+            img = this.sprites.attackHeavy[frameIdx];
+            isOneDirectional = true;
+        } else if (this.hurtTimer > 0) {
+            let frameIdx = Math.floor(this.animTimer / 5) % this.sprites.hurt.length;
+            img = this.sprites.hurt[frameIdx];
+            isOneDirectional = true;
+        } else if (this.isAttacking) {
+            let frameIdx = Math.floor(((25 - this.attackTimer) / 25) * this.sprites.attackBasic.length);
+            frameIdx = Math.min(this.sprites.attackBasic.length - 1, Math.max(0, frameIdx));
+            img = this.sprites.attackBasic[frameIdx];
+            isOneDirectional = true;
+        } else if (!this.grounded) {
+            img = this.sprites.jump[Math.floor(this.animTimer / 12) % 2];
+            isOneDirectional = true;
+        } else if (Math.abs(this.vx) > 0.5) {
+            img = this.facingRight ? 
+                  this.sprites.walkRight[Math.floor(this.animTimer / 10) % 2] : 
+                  this.sprites.walkLeft[Math.floor(this.animTimer / 10) % 2];
+        } else {
+            img = this.sprites.idle[Math.floor(this.animTimer / 20) % 2];
+            isOneDirectional = true;
         }
 
-        if (this.isInvulnerable) {
-            // Aura dash
-            ctx.fillStyle = 'rgba(60, 220, 124, 0.5)';
-            ctx.fillRect(drawX - 5, drawY - 5, this.w + 10, this.h + 10);
+        if (img && img.complete) {
+            let fw = img.width;
+            let fh = img.height;
+            let fx = 0;
+            let fy = 0;
+            let isSpriteSheet = false;
+            
+            // Khusus Died pakai sprite sheet (2x2 grid = 4 frame)
+            if (img === this.sprites.died) {
+                isSpriteSheet = true;
+                fw = img.width / 2;
+                fh = img.height / 2;
+                // Baris 0 = Kanan, Baris 1 = Kiri
+                let row = this.facingRight ? 0 : 1;
+                // Kolom 0 = Berdiri, Kolom 1 = Terkapar (mati)
+                let col = Math.min(1, Math.floor(this.animTimer / 45)); // Diperlama jadi 45 frame (0.75 dtk)
+                fx = col * fw;
+                fy = row * fh;
+            }
+
+            let drawW = 90;
+            let drawH = 90;
+            
+            if (this.isAttacking) {
+                // Gambar basic attack (550x1080) membuat karakter membesar jika dipaksa 90x90.
+                // Kita sesuaikan ukurannya agar seamless.
+                drawW = 60; 
+                drawH = 90; 
+            } else if (this.isHeavyAttacking) {
+                // Heavy attack (860x1080), kecilkan sedikit agar konsisten dengan idle
+                drawW = 65;
+                drawH = 82;
+            }
+            
+            // Khusus died, paksa proporsi kotak agar pas dengan canvas slice-nya
+            if (isSpriteSheet) {
+                drawW = 90;
+                drawH = 90;
+            }
+            
+            const imgX = drawX + this.w / 2 - drawW / 2;
+            const imgY = drawY + this.h - drawH + 15; // +15 kompensasi area kosong di kaki
+            
+            const needFlip = !this.facingRight && isOneDirectional;
+            
+            ctx.save();
+            if (needFlip) {
+                ctx.translate(drawX + this.w / 2, 0);
+                ctx.scale(-1, 1);
+                if (isSpriteSheet) {
+                    ctx.drawImage(img, fx, fy, fw, fh, -drawW / 2, imgY, drawW, drawH);
+                } else {
+                    ctx.drawImage(img, -drawW / 2, imgY, drawW, drawH);
+                }
+            } else {
+                if (isSpriteSheet) {
+                    ctx.drawImage(img, fx, fy, fw, fh, imgX, imgY, drawW, drawH);
+                } else {
+                    ctx.drawImage(img, imgX, imgY, drawW, drawH);
+                }
+            }
+            ctx.restore();
         }
 
-        if (this.isHeavyAttacking) {
-            ctx.fillStyle = '#ffaa00';
-            ctx.fillRect(drawX, drawY, this.w, this.h); // visual feedback
-        }
+        // Dash aura removed per request
 
         ctx.restore();
-        
-        // Gambar Attack Hitbox untuk debug/visual
-        if (this.attackHitbox) {
-            const hx = this.attackHitbox.x - camX;
-            const hy = this.attackHitbox.y;
-            ctx.fillStyle = this.attackHitbox.isHeavy ? 'rgba(255, 68, 85, 0.7)' : 'rgba(255, 255, 255, 0.7)';
-            ctx.fillRect(hx, hy, this.attackHitbox.w, this.attackHitbox.h);
-        }
     }
 
     reset() { // kembalikan ke titik awal saat retry / mulai baru
@@ -213,5 +355,12 @@ export class Player { // class entitas utama yang dikendalikan pemain
         this.quizCorrect = 0;
         this.jumpCount = 0;
         this.animTimer = 0;
+        this.hurtTimer = 0;
+        this.isInvulnerable = false;
+        this._invulTimer = 0;
+        this.isAttacking = false;
+        this.isHeavyAttacking = false;
+        this.attackTimer = 0;
+        this.heavyTimer = 0;
     }
 }

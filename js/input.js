@@ -47,6 +47,41 @@ export class InputHandler { // handler untuk input keyboard
         this.justPressed = {};
     }
 
+    setupTouchControls() {
+        const touchBtns = document.querySelectorAll('.touch-btn');
+        
+        touchBtns.forEach(btn => {
+            const keyCode = btn.getAttribute('data-key');
+            
+            // Prevent default behavior (like zooming, scrolling, or emulating mouse events)
+            const handleTouch = (e) => {
+                e.preventDefault(); 
+            };
+
+            btn.addEventListener('touchstart', (e) => {
+                e.preventDefault(); // Mencegah double-fire dari emulated mouse events
+                btn.classList.add('active'); // Manual visual feedback
+                
+                if (!this.keys[keyCode]) {
+                    this.justPressed[keyCode] = true;
+                }
+                this.keys[keyCode] = true;
+            }, { passive: false });
+
+            btn.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                btn.classList.remove('active');
+                this.keys[keyCode] = false;
+            }, { passive: false });
+
+            btn.addEventListener('touchcancel', (e) => {
+                e.preventDefault();
+                btn.classList.remove('active');
+                this.keys[keyCode] = false;
+            }, { passive: false });
+        });
+    }
+
     destroy() {
         window.removeEventListener('keydown', this._onKeyDown);
         window.removeEventListener('keyup', this._onKeyUp);

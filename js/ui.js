@@ -7,6 +7,7 @@ export class UIManager { // class untuk mengatur interaksi DOM dan HTML UI
             menuScreen: document.getElementById('menu-screen'),
             aboutModal: document.getElementById('about-modal'),
             levelMenuScreen: document.getElementById('level-menu-screen'),
+            pauseScreen: document.getElementById('pause-screen'),
             gameoverScreen: document.getElementById('gameover-screen'),
             gameoverReason: document.getElementById('gameover-reason'),
             winScreen: document.getElementById('win-screen'),
@@ -35,6 +36,13 @@ export class UIManager { // class untuk mengatur interaksi DOM dan HTML UI
             gameoverScoreValue: document.getElementById('gameover-score-value'),
             winScoreValue: document.getElementById('win-score-value'),
             winStars: document.getElementById('win-stars'),
+            winTrueMessage: document.getElementById('win-true-message'),
+
+            vnDialogScreen: document.getElementById('vn-dialog-screen'),
+            vnPortraitLeft: document.getElementById('vn-portrait-left'),
+            vnPortraitRight: document.getElementById('vn-portrait-right'),
+            vnSpeakerName: document.getElementById('vn-speaker-name'),
+            vnDialogText: document.getElementById('vn-dialog-text'),
 
             gameWrapper: document.getElementById('game-wrapper'),
         };
@@ -45,28 +53,124 @@ export class UIManager { // class untuk mengatur interaksi DOM dan HTML UI
         this._onRetry = null;
         this._onBackToMenu = null;
         this._onSelectLevel = null;
+        this._onResume = null;
+        this._onPauseMenu = null;
+
+        this._setupKeyboardNavigation();
+    }
+
+    _setupKeyboardNavigation() {
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                if (!this.elements.vnDialogScreen.classList.contains('hidden')) {
+                    if (this._onVNDialogNext) this._onVNDialogNext();
+                } else if (!this.elements.wartaPopup.classList.contains('hidden')) {
+                    document.getElementById('btn-close-warta').click();
+                } else if (!this.elements.quizFeedback.classList.contains('hidden')) {
+                    document.getElementById('btn-quiz-continue').click();
+                } else if (!this.elements.menuScreen.classList.contains('hidden')) {
+                    document.getElementById('btn-start').click();
+                } else if (!this.elements.gameoverScreen.classList.contains('hidden')) {
+                    document.getElementById('btn-retry').click();
+                } else if (!this.elements.winScreen.classList.contains('hidden')) {
+                    document.getElementById('btn-replay').click();
+                } else if (!this.elements.pauseScreen.classList.contains('hidden')) {
+                    document.getElementById('btn-resume').click();
+                }
+            }
+        });
     }
 
     _bindButtons() { // pasang event listener ke semua tombol UI
+        
+        // Workaround browser autoplay policy: play audio on first user interaction anywhere
+        document.body.addEventListener('click', () => {
+            const bgm = document.getElementById('bgm');
+            if (bgm && bgm.paused) {
+                bgm.volume = 0.2;
+                bgm.play().catch(e => {});
+            }
+        }, { once: true });
 
         document.getElementById('btn-start').addEventListener('click', () => {
             const bgm = document.getElementById('bgm');
             if (bgm) {
-                bgm.volume = 0.4; // Atur volume agar tidak terlalu berisik
+                bgm.volume = 0.2; // Sesuai request: 20% agar tidak mengganggu
                 bgm.play().catch(e => console.log("Audio play diizinkan setelah interaksi"));
             }
             if (this._onStartGame) this._onStartGame();
         });
 
+        this.elements.vnDialogScreen.addEventListener('click', () => {
+            if (this._onVNDialogNext) this._onVNDialogNext();
+        });
+
+        let aboutSource = 'menu';
+
         document.getElementById('btn-about').addEventListener('click', () => {
+            aboutSource = 'menu';
             this.elements.menuScreen.classList.add('hidden');
+            this.elements.aboutModal.classList.remove('hidden');
+        });
+        
+        document.getElementById('btn-pause-about').addEventListener('click', () => {
+            aboutSource = 'pause';
+            this.elements.pauseScreen.classList.add('hidden');
             this.elements.aboutModal.classList.remove('hidden');
         });
 
         document.getElementById('btn-close-about').addEventListener('click', () => {
             this.elements.aboutModal.classList.add('hidden');
-            this.elements.menuScreen.classList.remove('hidden');
+            if (aboutSource === 'menu') {
+                this.elements.menuScreen.classList.remove('hidden');
+            } else {
+                this.elements.pauseScreen.classList.remove('hidden');
+            }
         });
+
+        let settingsSource = 'menu';
+
+        document.getElementById('btn-settings').addEventListener('click', () => {
+            settingsSource = 'menu';
+            this.elements.menuScreen.classList.add('hidden');
+            document.getElementById('settings-modal').classList.remove('hidden');
+        });
+        
+        document.getElementById('btn-pause-settings').addEventListener('click', () => {
+            settingsSource = 'pause';
+            this.elements.pauseScreen.classList.add('hidden');
+            document.getElementById('settings-modal').classList.remove('hidden');
+        });
+
+        document.getElementById('btn-close-settings').addEventListener('click', () => {
+            document.getElementById('settings-modal').classList.add('hidden');
+            if (settingsSource === 'menu') {
+                this.elements.menuScreen.classList.remove('hidden');
+            } else {
+                this.elements.pauseScreen.classList.remove('hidden');
+            }
+        });
+
+        const bgmSlider = document.getElementById('bgm-slider');
+        const sfxSlider = document.getElementById('sfx-slider');
+        const bgmVal = document.getElementById('bgm-val');
+        const sfxVal = document.getElementById('sfx-val');
+
+        bgmSlider.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value);
+            bgmVal.textContent = Math.round(val * 100) + '%';
+            window.gameSettings.bgmVolume = val;
+            const bgm = document.getElementById('bgm');
+            if (bgm) bgm.volume = window.gameSettings.bgmBase * val;
+        });
+
+        sfxSlider.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value);
+            sfxVal.textContent = Math.round(val * 100) + '%';
+            window.gameSettings.sfxVolume = val;
+        });
+
+
 
         const btnLevelMenu = document.getElementById('btn-level-menu');
         if (btnLevelMenu) {
@@ -83,13 +187,24 @@ export class UIManager { // class untuk mengatur interaksi DOM dan HTML UI
                 this.elements.menuScreen.classList.remove('hidden');
             });
         }
+        
+        document.getElementById('btn-resume').addEventListener('click', () => {
+            if (this._onResume) this._onResume();
+        });
+        
+        document.getElementById('btn-pause-menu').addEventListener('click', () => {
+            if (this._onPauseMenu) this._onPauseMenu();
+        });
 
         // Event listener level buttons
         document.querySelectorAll('.btn-level').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                if (e.target.classList.contains('btn-locked')) return;
+                const button = e.currentTarget;
+                // Jika tombol terkunci dan Dev Mode tidak aktif, jangan proses
+                // Cek sebenarnya ada di callback main.js (onSelectLevel), jadi langsung teruskan saja
+                if (button.classList.contains('btn-locked')) return;
                 
-                const levelNum = parseInt(e.target.dataset.level);
+                const levelNum = parseInt(button.dataset.level);
                 this.elements.levelMenuScreen.classList.add('hidden');
                 if (this._onSelectLevel) this._onSelectLevel('start', levelNum);
             });
@@ -142,19 +257,97 @@ export class UIManager { // class untuk mengatur interaksi DOM dan HTML UI
         this.elements.menuScreen.classList.add('hidden');
     }
 
+    showVNDialog(dialogs, onComplete) {
+        this.elements.vnDialogScreen.classList.remove('hidden');
+        let currentIdx = 0;
+        
+        const renderDialog = () => {
+            if (currentIdx >= dialogs.length) {
+                this.elements.vnDialogScreen.classList.add('hidden');
+                this._onVNDialogNext = null;
+                if (onComplete) onComplete();
+                return;
+            }
+            
+            const step = dialogs[currentIdx];
+            this.elements.vnSpeakerName.textContent = step.speaker;
+            this.elements.vnDialogText.textContent = step.text;
+            
+            if (step.side === 'right') {
+                this.elements.vnPortraitRight.classList.remove('hidden');
+                this.elements.vnPortraitRight.classList.remove('inactive');
+                this.elements.vnPortraitLeft.classList.add('inactive');
+                this.elements.vnSpeakerName.classList.add('speaker-right');
+            } else {
+                this.elements.vnPortraitLeft.classList.remove('hidden');
+                this.elements.vnPortraitLeft.classList.remove('inactive');
+                this.elements.vnPortraitRight.classList.add('inactive');
+                this.elements.vnSpeakerName.classList.remove('speaker-right');
+            }
+            
+            if (step.action === 'jump-out') {
+                this.elements.vnPortraitRight.classList.add('jump-out');
+            }
+        };
+        
+        this._onVNDialogNext = () => {
+            currentIdx++;
+            renderDialog();
+        };
+        
+        // Reset state
+        this.elements.vnPortraitLeft.classList.add('hidden', 'inactive');
+        this.elements.vnPortraitRight.classList.add('hidden', 'inactive');
+        this.elements.vnPortraitRight.classList.remove('jump-out');
+        
+        renderDialog();
+    }
+
     showHUD() {
         this.elements.hud.classList.remove('hidden');
+        if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+            const mobileControls = document.getElementById('mobile-controls');
+            if (mobileControls) mobileControls.classList.remove('hidden');
+        }
     }
 
     hideHUD() {
         this.elements.hud.classList.add('hidden');
+        const mobileControls = document.getElementById('mobile-controls');
+        if (mobileControls) mobileControls.classList.add('hidden');
     }
 
-    updateHUD(score, bars, totalBars, currentLevel) { // update text di pojok kiri atas
+    updateHUD(score, bars, totalBars, currentLevel, playerHp = 100, bossHp = -1, bossMaxHp = 4000) { // update text di pojok kiri atas
         this.elements.scoreValue.textContent = score;
         this.elements.barsValue.textContent = `${bars} / ${totalBars}`;
         if (this.elements.levelValue && currentLevel) {
             this.elements.levelValue.textContent = `Level ${currentLevel}`;
+        }
+        
+        const hudPlayerHp = document.getElementById('hud-player-hp');
+        const playerHpBar = document.getElementById('player-hp-bar');
+        if (hudPlayerHp) {
+            if (bossHp >= 0) {
+                hudPlayerHp.classList.remove('hidden');
+                hudPlayerHp.style.display = 'flex';
+                if (playerHpBar) playerHpBar.style.width = Math.max(0, playerHp) + '%';
+            } else {
+                hudPlayerHp.classList.add('hidden');
+                hudPlayerHp.style.display = 'none';
+            }
+        }
+
+        const hudBossHp = document.getElementById('hud-boss-hp');
+        const bossHpBar = document.getElementById('boss-hp-bar');
+        if (hudBossHp) {
+            if (currentLevel === 3 && bossHp >= 0) {
+                hudBossHp.classList.remove('hidden');
+                hudBossHp.style.display = 'flex';
+                if (bossHpBar) bossHpBar.style.width = Math.max(0, (bossHp / bossMaxHp) * 100) + '%';
+            } else {
+                hudBossHp.classList.add('hidden');
+                hudBossHp.style.display = 'none';
+            }
         }
     }
 
@@ -255,21 +448,39 @@ export class UIManager { // class untuk mengatur interaksi DOM dan HTML UI
         this.elements.gameoverScreen.classList.add('hidden');
     }
 
-    showWin(score, barsCollected, totalBars) { // hitung bintang dan tampilkan menu menang
-        this.elements.winScoreValue.textContent = score;
+    showWin(player, totalBars) { // hitung bintang dan tampilkan menu menang
+        this.elements.winScoreValue.textContent = player.score;
 
         let stars = 1;
-        if (barsCollected >= totalBars) stars = 2;
-        if (barsCollected >= totalBars && score >= 500) stars = 3;
-
-        const starText = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
-        this.elements.winStars.textContent = starText;
+        let percentSilver = totalBars === 0 ? 1 : Math.min(1, player.barsCollected / totalBars);
+        
+        if (percentSilver > 0.5) stars++; // 2 bintang
+        if (percentSilver >= 1) stars++; // 3 bintang
+        if (player.quizCorrect >= 3) stars++; // 4 bintang
+        if (player.quizCorrect >= 5 && percentSilver >= 1) stars++;
+        const starSVG = `<svg width="32" height="32" viewBox="0 0 20 20"><polygon points="10,1 12.7,6.5 19,7.4 14.5,11.8 15.5,18 10,15.1 4.5,18 5.5,11.8 1,7.4 7.3,6.5" fill="#ffd700"/></svg>`;
+        const emptyStarSVG = `<svg width="32" height="32" viewBox="0 0 20 20"><polygon points="10,1 12.7,6.5 19,7.4 14.5,11.8 15.5,18 10,15.1 4.5,18 5.5,11.8 1,7.4 7.3,6.5" fill="#556677"/></svg>`;        
+        
+        let starHtml = '';
+        for (let i = 0; i < 5; i++) {
+            starHtml += (i < stars) ? starSVG : emptyStarSVG;
+        }
+        
+        this.elements.winStars.innerHTML = starHtml;
 
         this.elements.winScreen.classList.remove('hidden');
     }
 
     hideWin() {
         this.elements.winScreen.classList.add('hidden');
+    }
+    
+    showPause() {
+        this.elements.pauseScreen.classList.remove('hidden');
+    }
+    
+    hidePause() {
+        this.elements.pauseScreen.classList.add('hidden');
     }
 
     flashGravityEffect() {
@@ -283,4 +494,6 @@ export class UIManager { // class untuk mengatur interaksi DOM dan HTML UI
     onRetry(cb) { this._onRetry = cb; }
     onBackToMenu(cb) { this._onBackToMenu = cb; }
     onSelectLevel(cb) { this._onSelectLevel = cb; }
+    onResume(cb) { this._onResume = cb; }
+    onPauseMenu(cb) { this._onPauseMenu = cb; }
 }

@@ -27,18 +27,20 @@
                     <button id="btn-start" class="btn-pixel btn-primary">MULAI MAIN</button>
                     <button id="btn-level-menu" class="btn-pixel btn-primary">PILIH LEVEL</button>
                     <button id="btn-about" class="btn-pixel btn-secondary">TENTANG GAME</button>
+                    <button id="btn-settings" class="btn-pixel btn-secondary">PENGATURAN</button>
                 </div>
                 <div class="menu-controls">
-                    <p><span class="key-hint">W/A/S/D</span> atau <span class="key-hint">Panah</span> : Bergerak & Lompat (Bisa Double Jump)</p>
+                    <p><span class="key-hint">W/A/S/D</span> atau <span class="key-hint">Panah</span> : Bergerak & Lompat</p>
                     <p><span class="key-hint">E</span> : Bicara / Kuis</p>
-                    <p><span class="key-hint">J</span> : Sabetan Warta (Attack Dasar)</p>
-                    <p><span class="key-hint">K</span> : Tebasan Suroboyo (-50 Skor) (Pemecah Zirah/Hitstop)</p>
-                    <p><span class="key-hint">Shift</span> : Dash Jimpitan (-20 Skor) (Kebal Serangan)</p>
+                    <p><span class="key-hint">J</span> : Sabetan Warta</p>
+                    <p><span class="key-hint">K</span> : Tebasan Suroboyo</p>
+                    <p><span class="key-hint">Shift</span> : Dash Jimpitan</p>
+                    <p><span class="key-hint">Esc</span> : Pause Game</p>
                 </div>
             </div>
             
             <!-- BGM Audio Embed -->
-            <audio id="bgm" src="https://opengameart.org/sites/default/files/8-bit%20Platformer%20Theme.mp3" loop autoplay></audio>
+            <audio id="bgm" src="asset/music%20&%20SFX/02.%20Lively%20City.mp3" loop autoplay></audio>
         </div>
 
         <div id="level-menu-screen" class="overlay hidden">
@@ -47,8 +49,14 @@
                 <p>Mainkan level yang sudah terbuka.</p>
                 <div class="level-buttons">
                     <button id="btn-level-1" class="btn-pixel btn-level" data-level="1">LEVEL 1</button>
-                    <button id="btn-level-2" class="btn-pixel btn-level btn-locked" data-level="2">LEVEL 2 🔒</button>
-                    <button id="btn-level-3" class="btn-pixel btn-level btn-locked" data-level="3">LEVEL 3 🔒</button>
+                    <button id="btn-level-2" class="btn-pixel btn-level btn-locked" data-level="2">
+                        LEVEL 2 
+                        <svg class="icon-lock" width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M4 2h4v3H4V2zm-2 3h8v6H2V5zm3 2h2v2H5V7z"/></svg>
+                    </button>
+                    <button id="btn-level-3" class="btn-pixel btn-level btn-locked" data-level="3">
+                        LEVEL 3 
+                        <svg class="icon-lock" width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M4 2h4v3H4V2zm-2 3h8v6H2V5zm3 2h2v2H5V7z"/></svg>
+                    </button>
                 </div>
                 <button id="btn-close-level-menu" class="btn-pixel btn-secondary" style="margin-top: 20px;">KEMBALI KE MENU</button>
             </div>
@@ -63,29 +71,72 @@
                     <hr>
                     <h3>KONTROL:</h3>
                     <p>
-                        <span class="key-hint">A/D</span> atau <span class="key-hint">←/→</span> = Bergerak<br>
-                        <span class="key-hint">W</span> / <span class="key-hint">SPASI</span> / <span class="key-hint">↑</span> = Lompat<br>
-                        <span class="key-hint">LOMPAT 2x</span> = Double Jump di udara<br>
-                        <span class="key-hint">E</span> = Interaksi NPC
-                    </p>
+                    <p>Misi utamamu adalah mengumpulkan balok perak (Argen-bars) yang tersebar dan menjawab kuis finansial untuk membuka jalan!</p>
+                    
+                    <h3>Kontrol & Keybinds</h3>
+                    <ul style="list-style-type: none; padding-left: 0; text-align: left; margin: 0 auto; display: inline-block;">
+                        <li><span class="key-hint">W/A/S/D</span> atau <span class="key-hint">Panah</span> : Bergerak & Lompat (Bisa Double Jump)</li>
+                        <li><span class="key-hint">E</span> : Bicara dengan NPC / Menjawab Kuis</li>
+                        <li><span class="key-hint">J</span> : Sabetan Warta (Serangan Ringan)</li>
+                        <li><span class="key-hint">K</span> : Tebasan Suroboyo (Serangan Berat)</li>
+                        <li><span class="key-hint">Shift</span> : Dash Jimpitan (Kebal sesaat)</li>
+                        <li><span class="key-hint">Esc</span> : Pause Game / Kembali ke Menu</li>
+                        <li><span class="key-hint">R</span> : Force Respawn (Hanya aktif di Dev Mode)</li>
+                    </ul>
                 </div>
-                <button id="btn-close-about" class="btn-pixel btn-secondary">KEMBALI</button>
+                <button id="btn-close-about" class="btn-pixel btn-primary" style="margin-top: 15px;">MENGERTI</button>
+            </div>
+        </div>
+
+        <div id="settings-modal" class="overlay hidden">
+            <div class="modal-box">
+                <h2>PENGATURAN</h2>
+                <div class="settings-content" style="text-align: left; margin: 20px 0;">
+                    <div style="margin-bottom: 20px;">
+                        <label for="bgm-slider" style="display: block; margin-bottom: 8px;">Volume Music (BGM): <span id="bgm-val">100%</span></label>
+                        <input type="range" id="bgm-slider" min="0" max="1" step="0.05" value="1" style="width: 100%; cursor: pointer;">
+                    </div>
+                    <div>
+                        <label for="sfx-slider" style="display: block; margin-bottom: 8px;">Volume Efek (SFX): <span id="sfx-val">100%</span></label>
+                        <input type="range" id="sfx-slider" min="0" max="1" step="0.05" value="1" style="width: 100%; cursor: pointer;">
+                    </div>
+                </div>
+                <button id="btn-close-settings" class="btn-pixel btn-primary" style="margin-top: 15px; width: 100%;">TUTUP</button>
             </div>
         </div>
 
         <div id="hud" class="hidden">
             <div class="hud-left">
                 <div id="hud-level" class="hud-item">
-                    <span class="hud-icon">🌍</span>
+                    <svg class="hud-icon" width="16" height="16" viewBox="0 0 16 16" fill="#3cdc7c" shape-rendering="crispEdges">
+                        <path d="M4 2h8v2h2v8h-2v2H4v-2H2V4h2V2zm2 2v2H4v4h2v2h4V8h2V6h-2V4H6z"/>
+                    </svg>
                     <span id="level-value">Level 1</span>
                 </div>
                 <div id="hud-score" class="hud-item">
-                    <span class="hud-icon">🪙</span>
+                    <svg class="hud-icon rainbow-star" width="16" height="16" viewBox="0 0 16 16" fill="#ff4455" shape-rendering="crispEdges">
+                        <polygon points="8,1 10,6 15,6 11,9 12,14 8,11 4,14 5,9 1,6 6,6" />
+                    </svg>
                     <span id="score-value">0</span>
                 </div>
                 <div id="hud-bars" class="hud-item">
-                    <span class="hud-icon">🥈</span>
+                    <svg class="hud-icon" width="16" height="16" viewBox="0 0 16 16" fill="#c0c8d4" shape-rendering="crispEdges">
+                        <path d="M3 5h10v6H3V5zm2 2v2h6V7H5z"/>
+                    </svg>
                     <span id="bars-value">0 / 4</span>
+                </div>
+                <div id="hud-player-hp" class="hud-item hidden" style="margin-top: 3px;">
+                    <span style="color: #ff4455; font-size: 12px; font-family: 'Press Start 2P', cursive;">HP</span>
+                    <div style="width: 120px; height: 14px; background: #222; border: 2px solid #fff; margin-left: 8px;">
+                        <div id="player-hp-bar" style="width: 100%; height: 100%; background: #ff4455; transition: width 0.2s;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="hud-boss-hp" class="hidden" style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 400px; display: flex; flex-direction: column; align-items: center; z-index: 100;">
+                <span style="color: #ff4455; font-size: 16px; margin-bottom: 5px; text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000; font-family: 'Press Start 2P', cursive;">SUBO</span>
+                <div style="width: 100%; height: 20px; background: #222; border: 3px solid #fff; box-shadow: 0 4px 0 #000;">
+                    <div id="boss-hp-bar" style="width: 100%; height: 100%; background: #9b59b6; transition: width 0.2s;"></div>
                 </div>
             </div>
 
@@ -105,9 +156,13 @@
         <div id="warta-popup" class="overlay hidden">
             <div class="warta-box">
                 <div class="warta-header">
-                    <span class="warta-icon">⭐</span>
+                    <svg class="warta-icon" width="20" height="20" viewBox="0 0 20 20" fill="#ffd700" shape-rendering="crispEdges">
+                        <path d="M9 1h2v4h4v2h2v4h-2v4h-4v2H9v-2H5v-4H3V7h2V5h4V1z"/>
+                    </svg>
                     <span class="warta-title">BINTANG WARTA</span>
-                    <span class="warta-icon">⭐</span>
+                    <svg class="warta-icon" width="20" height="20" viewBox="0 0 20 20" fill="#ffd700" shape-rendering="crispEdges">
+                        <path d="M9 1h2v4h4v2h2v4h-2v4h-4v2H9v-2H5v-4H3V7h2V5h4V1z"/>
+                    </svg>
                 </div>
                 <div class="warta-label">INFO TERKINI</div>
                 <p id="warta-text">Fakta edukasi akan muncul di sini.</p>
@@ -118,7 +173,10 @@
         <div id="quiz-modal" class="overlay hidden">
             <div class="quiz-box">
                 <div class="quiz-npc-label">
-                    <span class="quiz-npc-icon">🤖</span>
+                    <svg class="quiz-npc-icon" width="24" height="24" viewBox="0 0 24 24" fill="#4a8ef7" shape-rendering="crispEdges">
+                        <path d="M5 5h14v10H5V5zm4 4h2v2H9V9zm4 0h2v2h-2V9zm-4 6h6v-2H9v2z"/>
+                        <path d="M8 2h8v3H8V2zM3 15h2v6h14v-6h2v8H3v-8z"/>
+                    </svg>
                     <span>NPC KUIS</span>
                 </div>
                 <p id="quiz-question" class="quiz-question-text">Pertanyaan akan muncul di sini?</p>
@@ -129,6 +187,17 @@
                     <p id="quiz-feedback-text"></p>
                     <button id="btn-quiz-continue" class="btn-pixel btn-primary">LANJUTKAN</button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Pause Screen -->
+        <div id="pause-screen" class="overlay hidden">
+            <div class="pause-content" style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
+                <h2 class="pause-title" style="text-align: center; margin-bottom: 5px;">Pause</h2>
+                <button id="btn-resume" class="btn-pixel btn-primary" style="width: 100%;">LANJUTKAN</button>
+                <button id="btn-pause-about" class="btn-pixel btn-info" style="width: 100%;">TENTANG GAME</button>
+                <button id="btn-pause-settings" class="btn-pixel btn-secondary" style="width: 100%;">PENGATURAN</button>
+                <button id="btn-pause-menu" class="btn-pixel btn-secondary" style="width: 100%;">KEMBALI KE MENU</button>
             </div>
         </div>
 
@@ -146,10 +215,17 @@
 
         <div id="win-screen" class="overlay hidden">
             <div class="win-content">
-                <div id="win-stars" class="win-stars">⭐⭐⭐</div>
+                <div id="win-stars" class="win-stars">
+                    <!-- Bintang akan dirender via JS -->
+                </div>
+                
+                <div style="position: relative; margin: 20px auto; width: 120px; height: 120px;">
+                    <img src="asset/utama/Idle 1.png" style="width: 100%; image-rendering: pixelated; filter: drop-shadow(0 0 10px #3cdc7c);" alt="Galuh">
+                </div>
+
                 <h2 class="win-title">FINISH!</h2>
                 <p class="win-subtitle">TUGAS SELESAI!</p>
-                <p class="win-description">Bagikan Perak & Ilmu ke Masyarakat Nusantara!</p>
+                <p id="win-true-message" class="win-description" style="font-size: 10px; color: #3cdc7c;">Kekayaan sejati Nusantara bukan hanya pada sumber dayanya, melainkan pada kecerdasan warganya mengelola aset tersebut.</p>
                 <p class="win-score">Skor Akhir: <span id="win-score-value">0</span></p>
                 <div class="menu-buttons">
                     <button id="btn-replay" class="btn-pixel btn-primary">MAIN LAGI</button>
@@ -157,7 +233,97 @@
                 </div>
             </div>
         </div>
+
+        <!-- VN Dialogue Screen -->
+        <div id="vn-dialog-screen" class="overlay hidden" style="background: rgba(0,0,0,0.4); backdrop-filter: none;">
+            <!-- TextBox Bawah -->
+            <div class="vn-dialog-box" id="vn-dialog-box">
+                <!-- Potret Kiri (Galuh) -->
+                <div id="vn-portrait-left" class="vn-portrait hidden">
+                    <img src="asset/utama/Idle 1.png" alt="Galuh">
+                </div>
+
+                <!-- Potret Kanan (Subo) -->
+                <div id="vn-portrait-right" class="vn-portrait hidden">
+                    <img src="asset/utama/Bos 1.png" alt="Subo">
+                </div>
+
+                <div id="vn-speaker-name" class="vn-speaker">Speaker Name</div>
+                <p id="vn-dialog-text" class="vn-text">Text goes here...</p>
+                <div class="vn-prompt">Tekan Enter / Klik untuk lanjut ➔</div>
+            </div>
+        </div>
     </div>
+
+    <!-- Orientation Lock Screen -->
+    <div id="orientation-lock">
+        <div class="orientation-content">
+            <svg class="icon-rotate" viewBox="0 0 100 100" width="120" height="120">
+                <!-- Phone -->
+                <rect x="30" y="20" width="40" height="60" rx="4" fill="none" stroke="#fff" stroke-width="4"/>
+                <rect x="42" y="72" width="16" height="4" fill="#fff"/>
+                <!-- Rotate Arrow Top -->
+                <path d="M 20 40 Q 30 10 70 20" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+                <polygon points="65,12 75,22 62,28" fill="#fff"/>
+                <!-- Rotate Arrow Bottom -->
+                <path d="M 80 60 Q 70 90 30 80" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+                <polygon points="35,88 25,78 38,72" fill="#fff"/>
+            </svg>
+            <h2>ROTATE YOUR PHONE</h2>
+            <p>Landscape Mode Required</p>
+        </div>
+    </div>
+
+    <!-- Mobile Touch Controls -->
+    <div id="mobile-controls" class="hidden">
+        <!-- D-Pad (Left Side) -->
+        <div class="dpad-container">
+            <button class="touch-btn" id="btn-left" data-key="ArrowLeft">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="#fff"><path d="M15,4 L7,12 L15,20 Z"/></svg>
+            </button>
+            <button class="touch-btn" id="btn-right" data-key="ArrowRight">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="#fff"><path d="M9,4 L17,12 L9,20 Z"/></svg>
+            </button>
+        </div>
+
+        <!-- Action Buttons (Right Side) -->
+        <div class="action-container">
+            <div class="action-row">
+                <button class="touch-btn action-btn" id="btn-jump" data-key="ArrowUp" style="background: rgba(60, 220, 124, 0.3);">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#3cdc7c"><path d="M12 4l-8 8h6v8h4v-8h6z"/></svg>
+                </button>
+                <button class="touch-btn action-btn" id="btn-interact" data-key="KeyE" style="background: rgba(255, 215, 0, 0.3);">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#ffd700"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7A8.38 8.38 0 0 1 4 11.5a8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                </button>
+            </div>
+            <div class="action-row">
+                <button class="touch-btn action-btn" id="btn-dash" data-key="ShiftLeft" style="background: rgba(192, 200, 212, 0.3);">
+                    <!-- Pixel Art Boot/Dash -->
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="#c0c8d4" shape-rendering="crispEdges">
+                        <path d="M9 5h6v2h-6V5zm-2 2h2v10H7V7zm8 0h2v10h-2V7zm-8 10h10v2H7v-2zm-4-4h4v2H3v-2zm0-4h4v2H3V9z"/>
+                    </svg>
+                </button>
+                <button class="touch-btn action-btn" id="btn-attack" data-key="KeyJ" style="background: rgba(74, 142, 247, 0.3);">
+                    <!-- Pixel Art Normal Sword -->
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="#4a8ef7" shape-rendering="crispEdges">
+                        <path d="M19 2h3v3l-2 2-3-3 2-2zm-4 4l3 3-9 9-3-3 9-9zm-6 6l3 3-5 5-2-2-1 2-2-1 1-2 2 2 4-5z"/>
+                    </svg>
+                </button>
+                <button class="touch-btn action-btn" id="btn-heavy" data-key="KeyK" style="background: rgba(255, 68, 85, 0.3);">
+                    <!-- Pixel Art Big/Heavy Sword -->
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="#ff4455" shape-rendering="crispEdges">
+                        <path d="M16 2h6v6l-2 2-4-4 2-2h-2V2zm-3 5l4 4-9 9-4-4 9-9zm-7 7l4 4-6 6-3-3-2 3-3-2 2-3 3 2 5-6z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Pause Button (Top Right) -->
+        <button class="touch-btn" id="btn-pause-mobile" data-key="Escape" style="position: absolute; top: 10px; right: 10px; width: 45px; height: 45px; background: rgba(0,0,0,0.5);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        </button>
+    </div>
+
 
     <script type="module" src="js/main.js"></script>
 </body>

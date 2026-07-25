@@ -1,13 +1,13 @@
-
-
-*, *::before, *::after {
+*,
+*::before,
+*::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
 :root {
-    
+
     --bg-dark: #0a0e1a;
     --bg-deep: #0d1525;
     --panel-bg: #111d33;
@@ -25,15 +25,18 @@
     --text-secondary: #8899aa;
     --text-muted: #556677;
 
-    --pixel-shadow: 
+    --pixel-shadow:
         0 4px 0 #1a2a1a,
         0 5px 0 #0a150a;
     --pixel-shadow-red:
         0 4px 0 #7a1a22,
         0 5px 0 #4a0a12;
+
+    --modal-scale: 1;
 }
 
-html, body {
+html,
+body {
     width: 100%;
     height: 100%;
     overflow: hidden;
@@ -47,13 +50,15 @@ html, body {
 
 #game-wrapper {
     position: relative;
-    width: min(94vw, 160vh);
+    width: 100vw;
+    max-width: calc(100vh * (16/9));
+    max-height: 100vh;
     aspect-ratio: 16 / 9;
     background: #000;
     overflow: hidden;
     border: 3px solid var(--panel-border);
     border-radius: 4px;
-    box-shadow: 
+    box-shadow:
         0 0 30px rgba(60, 220, 124, 0.15),
         0 0 80px rgba(10, 14, 26, 0.8);
 }
@@ -141,7 +146,7 @@ html, body {
     background: var(--panel-bg);
     color: var(--text-primary);
     border-color: var(--panel-border);
-    box-shadow: 
+    box-shadow:
         0 4px 0 #0a1020,
         0 5px 0 #050810;
 }
@@ -163,7 +168,7 @@ html, body {
     font-size: 42px;
     letter-spacing: 4px;
     margin-bottom: 10px;
-    text-shadow: 
+    text-shadow:
         0 0 20px var(--accent-green-glow),
         0 4px 0 #1a3a2a;
     animation: titlePulse 3s ease-in-out infinite;
@@ -171,14 +176,14 @@ html, body {
 
 .title-argent {
     color: var(--accent-silver);
-    text-shadow: 
+    text-shadow:
         0 0 15px rgba(192, 200, 212, 0.4),
         0 4px 0 #6a7080;
 }
 
 .title-ara {
     color: var(--accent-green);
-    text-shadow: 
+    text-shadow:
         0 0 20px var(--accent-green-glow),
         0 4px 0 var(--accent-green-dark);
 }
@@ -212,6 +217,7 @@ html, body {
 .menu-controls p {
     margin-bottom: 8px;
 }
+
 .menu-controls p:last-child {
     margin-bottom: 0;
 }
@@ -241,6 +247,7 @@ html, body {
     border-color: var(--accent-teal);
     color: var(--accent-teal);
 }
+
 .btn-level:hover:not(.btn-locked) {
     background: rgba(43, 196, 196, 0.2);
 }
@@ -251,6 +258,7 @@ html, body {
     background: rgba(10, 14, 26, 0.5);
     cursor: not-allowed;
 }
+
 .btn-locked:hover {
     transform: none;
     filter: none;
@@ -263,7 +271,7 @@ html, body {
     max-width: 600px;
     text-align: center;
     animation: fadeInUp 0.3s ease-out;
-    box-shadow: 0 0 40px rgba(0,0,0,0.5);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
 }
 
 .modal-box h2 {
@@ -310,7 +318,8 @@ html, body {
     pointer-events: none;
 }
 
-.hud-left, .hud-right {
+.hud-left,
+.hud-right {
     display: flex;
     gap: 16px;
 }
@@ -401,7 +410,7 @@ html, body {
     max-width: 520px;
     text-align: center;
     animation: fadeInUp 0.4s ease-out;
-    box-shadow: 
+    box-shadow:
         0 0 30px rgba(255, 215, 0, 0.15),
         inset 0 0 20px rgba(255, 215, 0, 0.05);
 }
@@ -452,7 +461,7 @@ html, body {
     width: 90%;
     text-align: center;
     animation: fadeInUp 0.4s ease-out;
-    box-shadow: 
+    box-shadow:
         0 0 30px rgba(74, 142, 247, 0.15),
         inset 0 0 20px rgba(74, 142, 247, 0.05);
 }
@@ -478,7 +487,7 @@ html, body {
     margin-bottom: 20px;
     text-align: left;
     padding: 12px;
-    background: rgba(0,0,0,0.3);
+    background: rgba(0, 0, 0, 0.3);
     border-left: 3px solid var(--accent-blue);
 }
 
@@ -547,7 +556,7 @@ html, body {
 .gameover-title {
     font-size: 36px;
     color: var(--accent-red);
-    text-shadow: 
+    text-shadow:
         0 0 20px var(--accent-red-glow),
         0 4px 0 #7a1a22;
     margin-bottom: 12px;
@@ -580,7 +589,7 @@ html, body {
 .win-title {
     font-size: 36px;
     color: var(--accent-green);
-    text-shadow: 
+    text-shadow:
         0 0 25px var(--accent-green-glow),
         0 4px 0 var(--accent-green-dark);
     margin-bottom: 12px;
@@ -610,22 +619,37 @@ html, body {
 @keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: scale(var(--modal-scale)) translateY(20px);
     }
+
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: scale(var(--modal-scale)) translateY(0);
     }
 }
 
 @keyframes titlePulse {
-    0%, 100% { filter: brightness(1); }
-    50% { filter: brightness(1.15); }
+
+    0%,
+    100% {
+        filter: brightness(1);
+    }
+
+    50% {
+        filter: brightness(1.15);
+    }
 }
 
 @keyframes gameoverPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
 }
 
 @keyframes missionSlideIn {
@@ -633,6 +657,7 @@ html, body {
         opacity: 0;
         transform: translateX(-50%) translateY(-20px);
     }
+
     to {
         opacity: 1;
         transform: translateX(-50%) translateY(0);
@@ -640,31 +665,76 @@ html, body {
 }
 
 @keyframes missionFadeOut {
-    from { opacity: 1; }
-    to { opacity: 0; pointer-events: none; }
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+        pointer-events: none;
+    }
 }
 
 @keyframes floatUpDown {
-    0%, 100% { transform: translateX(-50%) translateY(0); }
-    50% { transform: translateX(-50%) translateY(-6px); }
+
+    0%,
+    100% {
+        transform: translateX(-50%) translateY(0);
+    }
+
+    50% {
+        transform: translateX(-50%) translateY(-6px);
+    }
 }
 
 @keyframes starBlink {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(0.9); }
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.4;
+        transform: scale(0.9);
+    }
 }
 
 @keyframes correctFlash {
-    0%, 100% { filter: brightness(1); }
-    50% { filter: brightness(1.5); }
+
+    0%,
+    100% {
+        filter: brightness(1);
+    }
+
+    50% {
+        filter: brightness(1.5);
+    }
 }
 
 @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    20% { transform: translateX(-4px); }
-    40% { transform: translateX(4px); }
-    60% { transform: translateX(-3px); }
-    80% { transform: translateX(3px); }
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    20% {
+        transform: translateX(-4px);
+    }
+
+    40% {
+        transform: translateX(4px);
+    }
+
+    60% {
+        transform: translateX(-3px);
+    }
+
+    80% {
+        transform: translateX(3px);
+    }
 }
 
 #game-wrapper.gravity-flip {
@@ -672,7 +742,364 @@ html, body {
 }
 
 @keyframes gravityFlipFlash {
-    0% { box-shadow: 0 0 30px rgba(60, 220, 124, 0.15); }
-    50% { box-shadow: 0 0 50px rgba(43, 196, 196, 0.5); }
-    100% { box-shadow: 0 0 30px rgba(60, 220, 124, 0.15); }
+    0% {
+        box-shadow: 0 0 30px rgba(60, 220, 124, 0.15);
+    }
+
+    50% {
+        box-shadow: 0 0 50px rgba(43, 196, 196, 0.5);
+    }
+
+    100% {
+        box-shadow: 0 0 30px rgba(60, 220, 124, 0.15);
+    }
+}
+
+@keyframes rainbowPulse {
+    0% {
+        filter: hue-rotate(0deg) brightness(1.2);
+    }
+
+    50% {
+        filter: hue-rotate(180deg) brightness(1.5);
+        transform: scale(1.1);
+    }
+
+    100% {
+        filter: hue-rotate(360deg) brightness(1.2);
+    }
+}
+
+.rainbow-star {
+    animation: rainbowPulse 2s linear infinite;
+    transform-origin: center;
+}
+
+/* =========================================
+   VISUAL NOVEL DIALOGUE SYSTEM
+   ========================================= */
+
+#vn-dialog-screen {
+    z-index: 100;
+    /* Harus paling atas */
+}
+
+.vn-portrait {
+    position: absolute;
+    bottom: 100%;
+    /* Di atas border kotak teks */
+    width: 250px;
+    height: 250px;
+    overflow: hidden;
+    /* Potong badan yang tembus ke bawah */
+    margin-bottom: -4px;
+    /* Tumpuk sedikit di atas border */
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+#vn-portrait-left {
+    left: 20px;
+}
+
+#vn-portrait-right {
+    right: 20px;
+}
+
+/* Sembunyikan karakter pas lg gak ngomong (gelap/turun sedikit) */
+.vn-portrait.inactive {
+    filter: brightness(0.4);
+    transform: translateY(20px);
+}
+
+.vn-portrait.jump-out {
+    animation: vnJumpOut 0.5s ease-in forwards;
+}
+
+@keyframes vnJumpOut {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    50% {
+        transform: translateY(-300px);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(-500px);
+        opacity: 0;
+    }
+}
+
+.vn-portrait {
+    position: absolute;
+    bottom: 100%;
+    width: 150px;
+    height: 150px;
+    pointer-events: none;
+}
+
+.vn-portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+
+
+.vn-dialog-box {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 85%;
+    max-width: 800px;
+    background: rgba(10, 14, 26, 0.9);
+    border: 4px solid var(--accent-gold);
+    border-radius: 8px;
+    padding: 24px 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(255, 215, 0, 0.1);
+    z-index: 101;
+    animation: fadeInUp 0.4s ease-out;
+}
+
+.quiz-box {
+    background: rgba(10, 14, 26, 0.95);
+    border: 4px solid var(--accent-teal);
+    border-radius: 12px;
+    padding: 30px 40px;
+    width: 90%;
+    max-width: 600px;
+    text-align: center;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(43, 196, 196, 0.2);
+    animation: fadeInUp 0.4s ease-out forwards;
+    transform: scale(var(--modal-scale));
+}
+
+
+.vn-speaker {
+    position: absolute;
+    top: -20px;
+    left: 20px;
+    background: var(--accent-gold);
+    color: #000;
+    padding: 8px 16px;
+    font-size: 12px;
+    border: 2px solid #fff;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.5);
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+/* Jika subo bicara, pindah name tag ke kanan */
+.vn-speaker.speaker-right {
+    left: auto;
+    right: 20px;
+    background: var(--accent-red);
+    color: #fff;
+}
+
+.vn-text {
+    font-size: 12px;
+    line-height: 2;
+    color: var(--text-primary);
+    text-shadow: 2px 2px 0 #000;
+    min-height: 60px;
+}
+
+.vn-prompt {
+    text-align: right;
+    font-size: 8px;
+    color: var(--accent-teal);
+    margin-top: 15px;
+    animation: starBlink 1.5s infinite;
+}
+
+/* Mobile Controls & Orientation Lock */
+#orientation-lock {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #0a0e1a;
+    z-index: 99999;
+    display: none;
+    /* Sembunyikan by default */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+#orientation-lock .orientation-content {
+    animation: pulseLock 2s infinite;
+}
+
+#orientation-lock h2 {
+    color: #ffd700;
+    margin-top: 20px;
+    font-size: 18px;
+    letter-spacing: 2px;
+}
+
+#orientation-lock p {
+    color: #8899aa;
+    margin-top: 10px;
+    font-size: 10px;
+}
+
+@keyframes pulseLock {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Tampilkan lock screen jika device di mode portrait, Sembunyikan game */
+@media screen and (orientation: portrait) {
+    #orientation-lock {
+        display: flex !important;
+    }
+
+    #game-wrapper {
+        display: none !important;
+    }
+}
+
+/* Mobile Controls Layout */
+#mobile-controls {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    /* Let clicks pass through empty areas */
+    z-index: 50;
+    display: flex;
+    /* only if un-hidden */
+}
+
+/* Touch Button Base */
+.touch-btn {
+    pointer-events: auto;
+    /* Re-enable clicks for buttons */
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    transition: background 0.1s, transform 0.1s;
+}
+
+.touch-btn:active,
+.touch-btn.active {
+    background: rgba(255, 255, 255, 0.3) !important;
+    transform: scale(0.9);
+}
+
+/* D-Pad Container (Bottom Left) */
+.dpad-container {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    display: flex;
+    gap: 15px;
+}
+
+.dpad-container .touch-btn {
+    width: 60px;
+    height: 60px;
+}
+
+/* Action Container (Bottom Right) */
+.action-container {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 15px;
+}
+
+.action-row {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+}
+
+.action-row .action-btn {
+    width: 55px;
+    height: 55px;
+}
+
+@media (min-width: 1024px) {
+
+    /* Sembunyikan kontrol mobile jika layarnya besar (PC) walau touch-supported */
+    #mobile-controls {
+        display: none !important;
+    }
+}
+
+/* Fix UI Responsiveness for Landscape Mobile (Short Screens) */
+@media (max-height: 600px) {
+    .title-block {
+        margin-bottom: 15px;
+    }
+
+    #game-title {
+        font-size: 28px;
+    }
+
+    .menu-buttons {
+        gap: 8px;
+    }
+
+    .btn-pixel {
+        padding: 8px 16px;
+        font-size: 8px;
+    }
+
+    .menu-controls {
+        display: none;
+        /* Hide keybind text on very small heights */
+    }
+
+    :root {
+        --modal-scale: 0.75;
+    }
+
+    .quiz-box,
+    .win-content,
+    .gameover-content,
+    .modal-box,
+    .warta-box {
+        transform: scale(var(--modal-scale));
+    }
+
+    #hud-boss-hp {
+        top: 60px !important;
+        transform: translateX(-50%) scale(0.75) !important;
+        transform-origin: center center !important;
+    }
+
+    #hud {
+        padding-top: 30px !important;
+    }
 }
