@@ -43,9 +43,9 @@ function createLevel1() { // generate data statis untuk level 1
             { x: 3054, y: 310, w: 20, h: 20, type: 'warta', collected: false, factIndex: 6 }  // Di atas solar x=3000,y=340
         ],
         hazards: [
-            { x: 1350, y: 456, w: 100, h: 24, type: 'electric_floor' }, // Dipindah dari x=1050 (jurang) ke tanah
-            { x: 2400, y: 456, w: 120, h: 24, type: 'electric_floor' }, // Dipindah dari x=2230 (dekat jurang) ke tanah
-            { x: 3500, y: 456, w: 130, h: 24, type: 'electric_floor' } // Dipindah dari x=3370 (dekat jurang) ke tanah
+            { x: 1000, y: 480, w: 80, h: 24, type: 'electric_floor' }, // Di jurang pertama
+            { x: 2180, y: 480, w: 80, h: 24, type: 'electric_floor' }, // Di jurang kedua
+            { x: 3800, y: 460, w: 100, h: 24, type: 'electric_floor' }  // Di jurang ketiga
         ],
         npcs: [
             { x: 550, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 0, quizDone: false, interactZone: { x: 510, y: 400, w: 100, h: 80 } },
@@ -75,38 +75,38 @@ function createLevel2() { // generate data statis untuk level 2
             { x: 2720, y: 480, w: 840, h: 60, type: 'ground' }, // Gap 80
             { x: 3640, y: 480, w: 1360, h: 60, type: 'ground' }, // Gap 80
             
-            { x: 300, y: 340, w: 128, h: 20, type: 'solar' },
-            { x: 550, y: 290, w: 128, h: 20, type: 'solar' },
-            { x: 800, y: 240, w: 128, h: 20, type: 'solar' },
-            { x: 1600, y: 340, w: 128, h: 20, type: 'solar' },
-            { x: 2200, y: 320, w: 128, h: 20, type: 'solar' },
-            { x: 2600, y: 260, w: 128, h: 20, type: 'solar' },
-            { x: 3450, y: 340, w: 128, h: 20, type: 'solar' }
+            { x: 300, y: 360, w: 128, h: 20, type: 'solar' },
+            { x: 550, y: 340, w: 128, h: 20, type: 'solar' },
+            { x: 950, y: 320, w: 128, h: 20, type: 'solar' },
+            { x: 1600, y: 360, w: 128, h: 20, type: 'solar' },
+            { x: 2200, y: 340, w: 128, h: 20, type: 'solar' },
+            { x: 2500, y: 320, w: 128, h: 20, type: 'solar' },
+            { x: 3450, y: 360, w: 128, h: 20, type: 'solar' }
         ],
         collectibles: [
-            { x: 354, y: 310, w: 20, h: 16, type: 'silver', collected: false }, // Di atas solar x=300,y=340
-            { x: 1654, y: 310, w: 20, h: 16, type: 'silver', collected: false }, // Di atas solar x=1600,y=340
-            { x: 2254, y: 290, w: 20, h: 16, type: 'silver', collected: false }, // Di atas solar x=2200,y=320
-            { x: 3504, y: 310, w: 20, h: 16, type: 'silver', collected: false }, // Di atas solar x=3450,y=340
-            { x: 950, y: 450, w: 20, h: 16, type: 'silver', collected: false }, // Di tanah ground, jauh dari trap
+            { x: 354, y: 330, w: 20, h: 16, type: 'silver', collected: false }, 
+            { x: 1654, y: 330, w: 20, h: 16, type: 'silver', collected: false }, 
+            { x: 2254, y: 310, w: 20, h: 16, type: 'silver', collected: false }, 
+            { x: 3504, y: 330, w: 20, h: 16, type: 'silver', collected: false }, 
+            { x: 950, y: 450, w: 20, h: 16, type: 'silver', collected: false }, 
             
-            { x: 604, y: 260, w: 20, h: 20, type: 'warta', collected: false, factIndex: 0 }, // Di atas solar x=550,y=290
-            { x: 854, y: 210, w: 20, h: 20, type: 'warta', collected: false, factIndex: 1 }, // Di atas solar x=800,y=240
-            { x: 1400, y: 450, w: 20, h: 20, type: 'warta', collected: false, factIndex: 2 }, // Di tanah
-            { x: 1850, y: 450, w: 20, h: 20, type: 'warta', collected: false, factIndex: 3 }, // Di tanah, dipindah dari trap 2000
-            { x: 2654, y: 230, w: 20, h: 20, type: 'warta', collected: false, factIndex: 4 }, // Di atas solar x=2600,y=260
-            { x: 2850, y: 450, w: 20, h: 20, type: 'warta', collected: false, factIndex: 5 }  // Di tanah, dipindah dari trap 3000
+            { x: 604, y: 310, w: 20, h: 20, type: 'warta', collected: false, factIndex: 0 }, 
+            { x: 1004, y: 290, w: 20, h: 20, type: 'warta', collected: false, factIndex: 1 }, 
+            { x: 1400, y: 450, w: 20, h: 20, type: 'warta', collected: false, factIndex: 2 }, 
+            { x: 1850, y: 450, w: 20, h: 20, type: 'warta', collected: false, factIndex: 3 }, 
+            { x: 2554, y: 290, w: 20, h: 20, type: 'warta', collected: false, factIndex: 4 }, 
+            { x: 2850, y: 450, w: 20, h: 20, type: 'warta', collected: false, factIndex: 5 }  
         ],
         hazards: [
-            { x: 1050, y: 456, w: 120, h: 24, type: 'electric_floor' },
-            { x: 2000, y: 456, w: 120, h: 24, type: 'electric_floor' },
-            { x: 3000, y: 456, w: 120, h: 24, type: 'electric_floor' }
+            { x: 800, y: 480, w: 80, h: 24, type: 'electric_floor' },  // Di jurang pertama
+            { x: 1660, y: 480, w: 80, h: 24, type: 'electric_floor' }, // Di jurang kedua
+            { x: 2640, y: 480, w: 80, h: 24, type: 'electric_floor' }  // Di jurang ketiga
         ],
         npcs: [
             { x: 1300, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 0, quizDone: false, interactZone: { x: 1260, y: 400, w: 100, h: 80 } },
             { x: 2400, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 1, quizDone: false, interactZone: { x: 2360, y: 400, w: 100, h: 80 } },
             { x: 3300, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 2, quizDone: false, interactZone: { x: 3260, y: 400, w: 100, h: 80 } },
-            { x: 4300, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 3, quizDone: false, interactZone: { x: 4260, y: 400, w: 100, h: 80 } },
+            { x: 4000, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 3, quizDone: false, interactZone: { x: 4260, y: 400, w: 100, h: 80 } },
             { x: 4600, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 4, quizDone: false, interactZone: { x: 4560, y: 400, w: 100, h: 80 } }
         ],
         finishGate: { x: 4850, y: 380, w: 80, h: 100 },
@@ -148,11 +148,11 @@ function createLevel3() { // generate data statis untuk level 3 (Boss Level)
             { x: 822, y: 310, w: 20, h: 20, type: 'warta', collected: false, factIndex: 4 }  // Di atas solar x=800,y=340
         ],
         hazards: [
-            { x: 1300, y: 456, w: 100, h: 24, type: 'electric_floor' },
-            { x: 2300, y: 456, w: 100, h: 24, type: 'electric_floor' }
+            { x: 1000, y: 480, w: 80, h: 24, type: 'electric_floor' }, // Di jurang pertama
+            { x: 1940, y: 480, w: 80, h: 24, type: 'electric_floor' }  // Di jurang kedua
         ],
         npcs: [
-            { x: 900, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 0, quizDone: false, interactZone: { x: 860, y: 400, w: 100, h: 80 } },
+            { x: 800, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 0, quizDone: false, interactZone: { x: 860, y: 400, w: 100, h: 80 } },
             { x: 1600, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 1, quizDone: false, interactZone: { x: 1560, y: 400, w: 100, h: 80 } },
             { x: 2200, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 2, quizDone: false, interactZone: { x: 2160, y: 400, w: 100, h: 80 } }, // Dipindah dari x=2000 (jurang) ke tanah Ground 3
             { x: 2600, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 3, quizDone: false, interactZone: { x: 2560, y: 400, w: 100, h: 80 } },
