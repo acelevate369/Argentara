@@ -171,12 +171,6 @@ export class UIManager { // class untuk mengatur interaksi DOM dan HTML UI
             window.gameSettings.sfxVolume = val;
         });
 
-        const btnSettings = document.getElementById('btn-settings');
-        if (btnSettings) {
-            btnSettings.addEventListener('click', () => {
-                alert('Fitur pengaturan belum tersedia.');
-            });
-        }
 
         const btnDevMode = document.getElementById('btn-dev-mode');
         if (btnDevMode) {
