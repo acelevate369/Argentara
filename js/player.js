@@ -58,38 +58,37 @@ export class Player { // class entitas utama yang dikendalikan pemain
             walkLeft: [new Image(), new Image()],
             jump: [new Image(), new Image()]
         };
-        this.sprites.idle[0].src = 'asset/utama/Idle 1.png';
-        this.sprites.idle[1].src = 'asset/utama/Idle 2.png';
-        this.sprites.walkRight[0].src = 'asset/utama/Walk kanan 1.png';
-        this.sprites.walkRight[1].src = 'asset/utama/Walk kanan 2.png';
-        this.sprites.walkLeft[0].src = 'asset/utama/Walk kiri 1.png';
-        this.sprites.walkLeft[1].src = 'asset/utama/Walk kiri 2.png';
-        this.sprites.jump[0].src = 'asset/utama/Jump 1.png';
-        this.sprites.jump[1].src = 'asset/utama/Jump 2.png';
+        this.sprites.idle[0].src = 'asset/utama/Galuh/Idle/Idle 1.png';
+        this.sprites.idle[1].src = 'asset/utama/Galuh/Idle/Idle 2.png';
+        this.sprites.walkRight[0].src = 'asset/utama/Galuh/Walk/Walk kanan 1.png';
+        this.sprites.walkRight[1].src = 'asset/utama/Galuh/Walk/Walk kanan 2.png';
+        this.sprites.walkLeft[0].src = 'asset/utama/Galuh/Walk/Walk kiri 1.png';
+        this.sprites.walkLeft[1].src = 'asset/utama/Galuh/Walk/Walk kiri 2.png';
+        this.sprites.jump[0].src = 'asset/utama/Galuh/Jump/Jump 1.png';
+        this.sprites.jump[1].src = 'asset/utama/Galuh/Jump 2/Jump 2.png';
         
         this.sprites.attackBasic = [];
-        const attackFrames = [13, 14, 17, 15, 16];
-        for (let i of attackFrames) {
+        for (let i = 1; i <= 3; i++) {
             let img = new Image();
-            img.src = `asset/utama/Basic Attack & Hurt/${i}.png`;
+            img.src = `asset/utama/Galuh/Attack/${i}.png`;
             this.sprites.attackBasic.push(img);
         }
         
         this.sprites.hurt = [];
-        const hurtFrames = [19, 20];
-        for (let i of hurtFrames) {
+        for (let i = 1; i <= 2; i++) {
             let img = new Image();
-            img.src = `asset/utama/Basic Attack & Hurt/${i}.png`;
+            img.src = `asset/utama/Galuh/Hurt/${i}.png`;
             this.sprites.hurt.push(img);
         }
 
-        this.sprites.died = new Image();
-        this.sprites.died.src = 'asset/utama/Karakter_Utama_Died.png';
+        this.sprites.died = [new Image(), new Image()];
+        this.sprites.died[0].src = 'asset/utama/Galuh/Die/1.png';
+        this.sprites.died[1].src = 'asset/utama/Galuh/Die/2.png';
 
         this.sprites.attackHeavy = [];
-        for (let i = 27; i <= 30; i++) {
+        for (let i = 1; i <= 4; i++) {
             let img = new Image();
-            img.src = `asset/utama/Heaavy Attack/${i}.png`;
+            img.src = `asset/utama/Galuh/Heavy attack/${i}.png`;
             this.sprites.attackHeavy.push(img);
         }
 
@@ -244,8 +243,9 @@ export class Player { // class entitas utama yang dikendalikan pemain
         let isOneDirectional = false;
         
         if (!this.alive) {
-            img = this.sprites.died; // Died is still a sprite sheet!
-            isOneDirectional = false; // TIDAK perlu flip canvas, karena sprite died sudah punya sisi kiri di row bawah!
+            let frameIdx = Math.min(1, Math.floor(this.animTimer / 45)); // Diperlama jadi 45 frame per gambar
+            img = this.sprites.died[frameIdx];
+            isOneDirectional = true;
         } else if (this.isHeavyAttacking) {
             let frameIdx = Math.floor(((30 - this.heavyTimer) / 30) * this.sprites.attackHeavy.length);
             frameIdx = Math.min(this.sprites.attackHeavy.length - 1, Math.max(0, frameIdx));
@@ -273,47 +273,19 @@ export class Player { // class entitas utama yang dikendalikan pemain
         }
 
         if (img && img.complete) {
-            let fw = img.width;
-            let fh = img.height;
-            let fx = 0;
-            let fy = 0;
-            let isSpriteSheet = false;
-            
-            // Khusus Died pakai sprite sheet (2x2 grid = 4 frame)
-            if (img === this.sprites.died) {
-                isSpriteSheet = true;
-                fw = img.width / 2;
-                fh = img.height / 2;
-                // Baris 0 = Kanan, Baris 1 = Kiri
-                let row = this.facingRight ? 0 : 1;
-                // Kolom 0 = Berdiri, Kolom 1 = Terkapar (mati)
-                let col = Math.min(1, Math.floor(this.animTimer / 45)); // Diperlama jadi 45 frame (0.75 dtk)
-                fx = col * fw;
-                fy = row * fh;
-            }
-
             let drawW = 90;
             let drawH = 90;
+            let offsetY = 15;
             
-            if (this.isAttacking) {
-                // Gambar basic attack (550x1080) membuat karakter membesar jika dipaksa 90x90.
-                // Kita sesuaikan ukurannya agar seamless.
-                drawW = 60; 
-                drawH = 90; 
-            } else if (this.isHeavyAttacking) {
-                // Heavy attack (860x1080), kecilkan sedikit agar konsisten dengan idle
-                drawW = 65;
-                drawH = 82;
-            }
-            
-            // Khusus died, paksa proporsi kotak agar pas dengan canvas slice-nya
-            if (isSpriteSheet) {
-                drawW = 90;
-                drawH = 90;
+            // Perbesar khusus untuk sprite yang artwork-nya kekecilan
+            if (this.isAttacking || this.isHeavyAttacking || this.hurtTimer > 0 || !this.alive) {
+                drawW = 110;
+                drawH = 110;
+                offsetY = 18; // Kompensasi offset proporsional
             }
             
             const imgX = drawX + this.w / 2 - drawW / 2;
-            const imgY = drawY + this.h - drawH + 15; // +15 kompensasi area kosong di kaki
+            const imgY = drawY + this.h - drawH + offsetY;
             
             const needFlip = !this.facingRight && isOneDirectional;
             
@@ -321,17 +293,9 @@ export class Player { // class entitas utama yang dikendalikan pemain
             if (needFlip) {
                 ctx.translate(drawX + this.w / 2, 0);
                 ctx.scale(-1, 1);
-                if (isSpriteSheet) {
-                    ctx.drawImage(img, fx, fy, fw, fh, -drawW / 2, imgY, drawW, drawH);
-                } else {
-                    ctx.drawImage(img, -drawW / 2, imgY, drawW, drawH);
-                }
+                ctx.drawImage(img, -drawW / 2, imgY, drawW, drawH);
             } else {
-                if (isSpriteSheet) {
-                    ctx.drawImage(img, fx, fy, fw, fh, imgX, imgY, drawW, drawH);
-                } else {
-                    ctx.drawImage(img, imgX, imgY, drawW, drawH);
-                }
+                ctx.drawImage(img, imgX, imgY, drawW, drawH);
             }
             ctx.restore();
         }

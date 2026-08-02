@@ -232,12 +232,12 @@ export class Level { // class manajer level dan renderer
         this.imgMountainFar.src = 'asset/bg_mountains_far.png';
         
         this.imgSuro = [new Image(), new Image()];
-        this.imgSuro[0].src = 'asset/utama/Cak suro 1.png';
-        this.imgSuro[1].src = 'asset/utama/Cak suro 2.png';
+        this.imgSuro[0].src = 'asset/utama/suro & boyo/Cak suro 1.png';
+        this.imgSuro[1].src = 'asset/utama/suro & boyo/Cak suro 2.png';
 
         this.imgBaya = [new Image(), new Image()];
-        this.imgBaya[0].src = 'asset/utama/Cak baya 1.png';
-        this.imgBaya[1].src = 'asset/utama/Cak baya 2.png';
+        this.imgBaya[0].src = 'asset/utama/suro & boyo/Cak baya 1.png';
+        this.imgBaya[1].src = 'asset/utama/suro & boyo/Cak baya 2.png';
         
         const processBg = (img, cropPercent, fadePercent = 0.15, tint = null) => {
             const canvas = document.createElement('canvas');

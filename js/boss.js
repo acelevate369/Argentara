@@ -39,37 +39,42 @@ export class SuboAI {
             ultimate: [],
             ultimateOmbak: []
         };
-        this.sprites.idle[0].src = 'asset/utama/Bos 1.png';
-        this.sprites.idle[1].src = 'asset/utama/Bos 2.png';
+        this.sprites.idle[0].src = 'asset/utama/Subo/Idle/Bos 1.png';
+        this.sprites.idle[1].src = 'asset/utama/Subo/Idle/Bos 2.png';
         
-        for (let i = 32; i <= 34; i++) {
+        for (let i = 1; i <= 2; i++) {
             let img = new Image();
-            img.src = `asset/utama/Subo_Sabetan_Jarak_Dekat/${i}.png`;
+            img.src = `asset/utama/Subo/Attack/${i}.png`;
             this.sprites.swipe.push(img);
         }
-        for (let i = 41; i <= 43; i++) {
+        for (let i of [1, 3, 4, 2]) {
             let img = new Image();
-            img.src = `asset/utama/Subo_Lompat/${i}.png`;
+            img.src = `asset/utama/Subo/Jump/${i}.png`;
             this.sprites.jump.push(img);
         }
-        for (let i = 36; i <= 39; i++) {
+        for (let i = 1; i <= 2; i++) {
             let img = new Image();
-            img.src = `asset/utama/Subo_Dash/${i}.png`;
+            img.src = `asset/utama/Subo/Dash/${i}.png`;
             this.sprites.dash.push(img);
         }
-        for (let i = 45; i <= 49; i++) {
+        for (let i = 1; i <= 4; i++) {
             let img = new Image();
-            img.src = `asset/utama/Subo_Ultimate/${i}.png`;
+            img.src = `asset/utama/Subo/Ulti/${i}.png`;
             this.sprites.ultimate.push(img);
         }
-        for (let i = 50; i <= 55; i++) {
+        for (let i = 1; i <= 3; i++) {
             let img = new Image();
-            img.src = `asset/utama/Subo_Ultimate/Ultimate_Ombak/${i}.png`;
+            img.src = `asset/utama/Subo/Wave/${i}.png`;
             this.sprites.ultimateOmbak.push(img);
         }
         
-        this.sprites.hurt = new Image();
-        this.sprites.hurt.src = 'asset/utama/Subo_Hurt.png';
+        this.sprites.hurt = [new Image(), new Image()];
+        this.sprites.hurt[0].src = 'asset/utama/Subo/Hurt/1.png';
+        this.sprites.hurt[1].src = 'asset/utama/Subo/Hurt/2.png';
+
+        this.sprites.died = [new Image(), new Image()];
+        this.sprites.died[0].src = 'asset/utama/Subo/Die/1.png';
+        this.sprites.died[1].src = 'asset/utama/Subo/Die/2.png';
 
         // SFX
         this.sfxSwipe = new Audio('asset/music & SFX/sfx/Subo Sabetan Dekat.mp3');
@@ -90,6 +95,11 @@ export class SuboAI {
         for (const plat of platforms) {
             if (checkAABB(this, plat)) {
                 if (this.vy > 0) {
+                    // Mencegah boss teleport/ngawang ke atas panel surya jika dia sudah berada di bawahnya
+                    let prevBottom = (this.y - this.vy) + this.h;
+                    if (plat.type === 'solar' && prevBottom > plat.y + 20) {
+                        continue; // Abaikan collision, biarkan boss jatuh tembus ke bawah
+                    }
                     this.y = plat.y - this.h;
                     this.vy = 0;
                     grounded = true;
@@ -115,7 +125,7 @@ export class SuboAI {
                 if (this.timer <= 0) {
                     this.state = 'ATTACK_SWIPE';
                     this.timer = 40;
-                    this.hitboxExpanded = true;
+                    this.hitboxExpanded = false; // Akan diaktifkan pada frame aktif
                     this.sfxSwipe.volume = 1.0 * (window.gameSettings ? window.gameSettings.sfxVolume : 1.0);
                     this.sfxSwipe.currentTime = 0;
                     this.sfxSwipe.play().catch(e => console.log(e));
@@ -123,6 +133,9 @@ export class SuboAI {
                 break;
                 
             case 'ATTACK_SWIPE':
+                // Sabetan hitbox cuma aktif di tengah-tengah animasi biar nggak overkill awal-awal
+                this.hitboxExpanded = (this.timer < 28 && this.timer > 10);
+                
                 if (this.timer <= 0) {
                     this.hitboxExpanded = false;
                     this.state = 'IDLE';
@@ -174,7 +187,7 @@ export class SuboAI {
                 if (grounded) {
                     this.vx = 0;
                     this.state = 'RECOVERY_ANTIAIR';
-                    this.timer = 20; // Landing lag
+                    this.timer = 30; // Landing lag (agak lama dikit)
                     this.sfxLanding.volume = 0.8 * (window.gameSettings ? window.gameSettings.sfxVolume : 1.0);
                     this.sfxLanding.currentTime = 0;
                     this.sfxLanding.play().catch(e => console.log(e));
@@ -253,6 +266,7 @@ export class SuboAI {
             this.x = 4080 - this.w/2;
             this.state = 'TELEGRAPH_TSUNAMI';
             this.timer = 45; // 750ms
+            this._lastFaceRight = (player.x > this.x);
         } else if (Math.abs(player.x - this.x) < 150 && player.y + player.h >= this.y + this.h - 60 && player.y <= this.y + this.h + 20) {
             this.state = 'TELEGRAPH_SWIPE';
             this.timer = 45; // 750ms
@@ -261,7 +275,7 @@ export class SuboAI {
             let jumpChance = (player.y < this.y - 50) ? 0.8 : 0.3; // 80% chance lompat jika player ngendok di atas
             if (Math.random() < jumpChance) {
                 this.state = 'TELEGRAPH_ANTIAIR';
-                this.timer = 30; // 500ms telegraph
+                this.timer = 10; // ancang-ancang bentar aja
                 this._lastFaceRight = (player.x > this.x);
             } else {
                 this.state = 'TELEGRAPH_CHARGE';
@@ -338,18 +352,30 @@ export class SuboAI {
         
         if (this.state === 'IDLE') {
             img = this.sprites.idle[Math.floor(this.animTimer / 20) % 2];
+        } else if (this.state === 'DYING') {
+            let frameIdx = Math.min(1, Math.floor((120 - this.timer) / 60)); // Ganti di pertengahan
+            img = this.sprites.died[frameIdx];
+            isOneDirectional = true;
+        } else if (this.state === 'HITSTOP' || this.state === 'HURT') {
+            let frameIdx = Math.floor(this.animTimer / 5) % 2; // blink effect
+            img = this.sprites.hurt[frameIdx];
+            isOneDirectional = true;
         } else if (this.state === 'TELEGRAPH_CHARGE' || this.state === 'ATTACK_CHARGE') {
             let frameIdx = Math.floor(this.animTimer / 12) % this.sprites.dash.length;
             img = this.sprites.dash[frameIdx];
             isOneDirectional = true;
         } else if (this.state === 'TELEGRAPH_ANTIAIR') {
-            img = this.sprites.jump[0]; // 41.png ancang-ancang
+            img = this.sprites.jump[0]; // 1.png ancang-ancang
             isOneDirectional = true;
         } else if (this.state === 'ATTACK_ANTIAIR') {
-            img = this.sprites.jump[1]; // 42.png melayang
+            if (this.vy < -14) { // vy goes from -18 to positive, so < -14 is just the first few frames
+                img = this.sprites.jump[1]; // 3.png baru mau lompat
+            } else {
+                img = this.sprites.jump[2]; // 4.png pas di udara
+            }
             isOneDirectional = true;
         } else if (this.state === 'RECOVERY_ANTIAIR') {
-            img = this.sprites.jump[2]; // 43.png mendarat
+            img = this.sprites.jump[3]; // 2.png mendarat
             isOneDirectional = true;
         } else if (this.state === 'TELEGRAPH_SWIPE' || this.state === 'ATTACK_SWIPE') {
             // Sabetan: 40 frame durasi / 13 ≈ 3 frame unik, sedikit lebih cepat
@@ -358,7 +384,7 @@ export class SuboAI {
             img = this.sprites.swipe[frameIdx];
             isOneDirectional = true;
         } else if (this.state === 'TELEGRAPH_TSUNAMI' || this.state === 'ATTACK_TSUNAMI') {
-            let frameIdx = Math.floor(this.animTimer / 8) % this.sprites.ultimate.length;
+            let frameIdx = Math.floor(this.animTimer / 15) % this.sprites.ultimate.length; // Agak lama tiap frame
             img = this.sprites.ultimate[frameIdx];
             isOneDirectional = true;
         } else if (this.state === 'HITSTOP' || this.state === 'DYING' || this.state === 'HURT') {
@@ -367,19 +393,24 @@ export class SuboAI {
         }
 
         if (img && img.complete) {
-            // User memaksakan ukuran seragam agar tidak notice beda frame
             let drawW = 130;
             let drawH = 130;
+            let offsetY = 20;
             
-            // Sabetan digambar sedikit lebih kecil lebarnya agar seamless dengan Idle
-            if (this.state.includes('SWIPE')) {
-                drawW = 110;
+            // Perbesar sprite yang artwork barunya tergambar kecil di tengah canvas
+            if (this.state.includes('SWIPE') || this.state.includes('TSUNAMI') || this.state === 'DYING' || this.state === 'HITSTOP' || this.state === 'HURT') {
+                drawW = 180;
+                drawH = 180;
+                offsetY = 35;
+                if (this.state.includes('SWIPE')) {
+                    offsetY = 45; // Basic attack diturunkan sedikit (tadi 75 kebablasan)
+                }
             }
             
             // X ditaruh di tengah hitbox
             const imgX = drawX + this.w/2 - drawW/2;
             // Y ditaruh menempel di tanah (offset ditambah sedikit jika sprite punya whitespace di bawah)
-            const imgY = drawY + this.h - drawH + 20; 
+            const imgY = drawY + this.h - drawH + offsetY; 
             
             // Determine facing direction based on state
             let faceRight;
@@ -394,8 +425,8 @@ export class SuboAI {
                     faceRight = false;
                 }
             } else if (this.state === 'TELEGRAPH_TSUNAMI' || this.state === 'ATTACK_TSUNAMI') {
-                // Ultimate: hadap berdasarkan posisi terakhir (vx bisa 0)
-                faceRight = false; // Default, ultimate biasanya di tengah
+                // Ultimate: hadap berdasarkan posisi player
+                faceRight = this._lastFaceRight || false;
             } else if (this.state === 'TELEGRAPH_CHARGE' || this.state === 'ATTACK_CHARGE') {
                 // Dash: arah ditentukan oleh vx ATAU posisi saat telegraph (vx masih 0)
                 if (this.vx !== 0) {
@@ -416,7 +447,12 @@ export class SuboAI {
                 this._lastFaceRight = faceRight;
             }
 
-            const needFlip = !faceRight && isOneDirectional;
+            let needFlip = !faceRight && isOneDirectional;
+            
+            // Subo jump, dash, dan ultimate sprites menghadap ke kiri secara default
+            if (this.sprites.jump.includes(img) || this.sprites.dash.includes(img) || this.sprites.ultimate.includes(img)) {
+                needFlip = faceRight && isOneDirectional;
+            }
 
             if (needFlip) {
                 ctx.save();
@@ -433,7 +469,7 @@ export class SuboAI {
         // Render Tsunami Wave
         if (this.tsunamiWave) {
             // Hitung frame berdasarkan progres serangan (120 frame total)
-            let frameIdx = Math.floor((120 - this.timer) / 20); // Ganti tiap 20 frame
+            let frameIdx = Math.floor((120 - this.timer) / 40); // Ganti tiap 40 frame (slower wave)
             frameIdx = Math.min(this.sprites.ultimateOmbak.length - 1, Math.max(0, frameIdx));
             let ombakImg = this.sprites.ultimateOmbak[frameIdx];
             
@@ -443,29 +479,17 @@ export class SuboAI {
                 // Gambar gelombang ke kiri (wave1X)
                 let wave1X = this.x - (120 - this.timer)*4 - camX;
                 ctx.save();
-                if (frameIdx === 5) {
-                    // Frame 55 (splash) default menghantam dinding kiri, jadi TIDAK di-flip
-                    ctx.drawImage(ombakImg, wave1X, this.tsunamiWave.y - 100, 150, 150);
-                } else {
-                    // Frame ombak biasa menghadap kanan, jadi untuk ke kiri HARUS di-flip
-                    ctx.translate(wave1X + 75, 0);
-                    ctx.scale(-1, 1);
-                    ctx.drawImage(ombakImg, -75, this.tsunamiWave.y - 100, 150, 150);
-                }
+                // Frame ombak biasa menghadap kanan, jadi untuk ke kiri HARUS di-flip
+                ctx.translate(wave1X + 75, 0);
+                ctx.scale(-1, 1);
+                ctx.drawImage(ombakImg, -75, this.tsunamiWave.y - 100, 150, 150);
                 ctx.restore();
 
                 // Gambar gelombang ke kanan (wave2X)
                 let wave2X = this.x + this.w + (120 - this.timer)*4 - camX;
                 ctx.save();
-                if (frameIdx === 5) {
-                    // Frame 55 (splash) default menghantam dinding kiri, jadi untuk ke kanan HARUS di-flip
-                    ctx.translate(wave2X + 75, 0);
-                    ctx.scale(-1, 1);
-                    ctx.drawImage(ombakImg, -75, this.tsunamiWave.y - 100, 150, 150);
-                } else {
-                    // Frame ombak biasa menghadap kanan, jadi TIDAK di-flip
-                    ctx.drawImage(ombakImg, wave2X, this.tsunamiWave.y - 100, 150, 150);
-                }
+                // Frame ombak biasa menghadap kanan, jadi TIDAK di-flip
+                ctx.drawImage(ombakImg, wave2X, this.tsunamiWave.y - 100, 150, 150);
                 ctx.restore();
                 
                 // RESTORE THE OUTER SAVE TO PREVENT CONTEXT LEAK!
@@ -520,8 +544,8 @@ export class SuboAI {
 
         // Smart hitboxes: semua relatif terhadap posisi boss (this.x, this.y)
         if (this.hitboxExpanded) {
-            // Sabetan: hitbox panjang ke arah serangan (dikurangi range-nya)
-            const swipeW = 110; 
+            // Sabetan: hitbox panjang ke arah serangan (dikurangi range-nya agar tidak overkill jauh)
+            const swipeW = 75; 
             const swipeH = 50;
             boxes.push({
                 x: faceRight ? this.x + this.w/2 : this.x - swipeW + this.w/2,
@@ -546,14 +570,6 @@ export class SuboAI {
                 y: this.y,
                 w: this.w - 20,
                 h: this.h
-            });
-        } else if (!this.hitboxExpanded) {
-            // Default body hitbox (idle, telegraph, etc)
-            boxes.push({
-                x: this.x + 15,
-                y: this.y + 10,
-                w: this.w - 30,
-                h: this.h - 10
             });
         }
         
