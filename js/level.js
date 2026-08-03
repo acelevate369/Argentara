@@ -7,10 +7,10 @@ import { QUIZ_EASY, QUIZ_MEDIUM, QUIZ_HARD, WARTA_FACTS } from './quiz-database.
 function createLevel1() { // generate data statis untuk level 1
     return {
         name: "Desa Argentara - Level 1 (Easy)",
-        mission: "Kumpulkan 4 Argen-bars & Selesaikan Kuis!",
+        mission: "Kumpulkan 3 Argen-bars & Selesaikan Kuis!",
         width: 4800,
         height: 540,
-        requiredBars: 4,
+        requiredBars: 3,
         playerSpawn: { x: 80, y: 400 },
         quizData: QUIZ_EASY,
         platforms: [
@@ -62,7 +62,7 @@ function createLevel1() { // generate data statis untuk level 1
 function createLevel2() { // generate data statis untuk level 2
     return {
         name: "Pabrik Terbengkalai - Level 2 (Medium)",
-        mission: "Kumpulkan 5 Argen-bars & Hati-hati jebakan!",
+        mission: "Kumpulkan 5 Argen-bars & Selesaikan Kuis!",
         width: 5000,
         height: 540,
         requiredBars: 5,
@@ -106,7 +106,7 @@ function createLevel2() { // generate data statis untuk level 2
             { x: 1300, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 0, quizDone: false, interactZone: { x: 1260, y: 400, w: 100, h: 80 } },
             { x: 2400, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 1, quizDone: false, interactZone: { x: 2360, y: 400, w: 100, h: 80 } },
             { x: 3300, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 2, quizDone: false, interactZone: { x: 3260, y: 400, w: 100, h: 80 } },
-            { x: 4000, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 3, quizDone: false, interactZone: { x: 4260, y: 400, w: 100, h: 80 } },
+            { x: 4000, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 3, quizDone: false, interactZone: { x: 3960, y: 400, w: 100, h: 80 } },
             { x: 4600, y: 432, w: 28, h: 48, type: 'quiz_robot', quizIndex: 4, quizDone: false, interactZone: { x: 4560, y: 400, w: 100, h: 80 } }
         ],
         finishGate: { x: 4850, y: 380, w: 80, h: 100 },
@@ -492,7 +492,8 @@ export class Level { // class manajer level dan renderer
         }
 
         if (this.data.finishGate && checkAABB(player, this.data.finishGate)) {
-            if (player.barsCollected >= this.data.requiredBars) {
+            const allQuizDone = this.data.npcs.every(npc => npc.quizDone);
+            if ((allQuizDone && player.barsCollected >= this.data.requiredBars) || this.isDevMode) {
                 events.push({ type: 'reach_finish', data: null });
             }
         }
