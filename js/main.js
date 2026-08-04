@@ -131,6 +131,7 @@ class Game { // class utama yang mengatur game loop dan logic
         
         this.ui.onToggleDevMode(() => {
             this.isDevMode = !this.isDevMode;
+            this.level.isDevMode = this.isDevMode; // Sinkronkan state Dev Mode ke Level
             if (this.isDevMode && this.player) {
                 this.player.score = 9999;
             }
@@ -162,6 +163,7 @@ class Game { // class utama yang mengatur game loop dan logic
         this.player.reset();
         
         this.state = STATE.PLAYING;
+        this.level.isDevMode = this.isDevMode; // Pastikan tersinkron saat pindah level
         
         // Bersihkan data boss state lama
         this.boss = null;
@@ -509,6 +511,31 @@ class Game { // class utama yang mengatur game loop dan logic
                 // Actually the original code just did `this.shakeTimer -= this.fixedDt;` here. Let's just remove the internal decrement.
             }
 
+            // Boss Fight Point Spawner
+            if (!this.bossPointTimer) this.bossPointTimer = 0;
+            this.bossPointTimer++;
+            if (this.bossPointTimer >= 480) { // Setiap 8 detik (480 frame @ 60fps)
+                this.bossPointTimer = 0;
+                const arena = this.level.data.bossArena;
+                if (arena) {
+                    let rx, ry;
+                    const panels = this.level.data.platforms.filter(p => p.x >= arena.x && p.type === 'solar');
+                    
+                    if (panels.length > 0 && Math.random() < 0.5) {
+                        // Spawn di atas panel surya acak
+                        const panel = panels[Math.floor(Math.random() * panels.length)];
+                        rx = panel.x + 10 + Math.random() * (panel.w - 20);
+                        ry = panel.y - 20;
+                    } else {
+                        // Spawn di tanah (ngacak sepanjang arena)
+                        rx = arena.x + 50 + Math.random() * (arena.width - 100);
+                        ry = 450;
+                    }
+                    
+                    this.level.spawnBossSilver(rx, ry);
+                }
+            }
+
             // Kunci kamera di arena boss
             const arena = this.level.data.bossArena;
             this.camera.x = arena.x;
@@ -584,7 +611,7 @@ class Game { // class utama yang mengatur game loop dan logic
     // Hapus duplikasi cek mati di update() karena sudah ditangani oleh _handleEvents()
 
 
-        if (this.state === STATE.PLAYING) {
+        if (this.state === STATE.PLAYING || this.state === STATE.BOSS_FIGHT) {
             this._nearNPC = null; // HARUS di-reset setiap frame sebelum dicek ulang
             const events = this.level.checkInteractions(this.player);
             this._handleEvents(events);

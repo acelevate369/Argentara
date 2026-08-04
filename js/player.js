@@ -195,8 +195,7 @@ export class Player { // class entitas utama yang dikendalikan pemain
                 this.sfxBasicAttack.currentTime = 0;
                 this.sfxBasicAttack.volume = 1.0 * (window.gameSettings ? window.gameSettings.sfxVolume : 1.0);
                 this.sfxBasicAttack.play().catch(e => console.log(e));
-            } else if (input.isJustPressed('ShiftLeft') && this.score >= 20) { // Dash
-                this.score -= 20;
+            } else if (input.isJustPressed('ShiftLeft')) { // Dash
                 this.isDashing = true;
                 this.isInvulnerable = true;
                 this.dashTimer = 15; // frames

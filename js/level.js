@@ -120,7 +120,7 @@ function createLevel3() { // generate data statis untuk level 3 (Boss Level)
         mission: "Selesaikan 5 Kuis, Kalahkan Subo!",
         width: 5000,
         height: 540,
-        requiredBars: 0,
+        requiredBars: 3,
         playerSpawn: { x: 80, y: 400 },
         quizData: QUIZ_HARD,
         platforms: [
@@ -141,11 +141,16 @@ function createLevel3() { // generate data statis untuk level 3 (Boss Level)
             { x: 4400, y: 370, w: 128, h: 20, type: 'solar' }
         ],
         collectibles: [
+            // 5 Warta
             { x: 422, y: 310, w: 20, h: 20, type: 'warta', collected: false, factIndex: 0 }, // Di atas solar x=400,y=340
             { x: 622, y: 260, w: 20, h: 20, type: 'warta', collected: false, factIndex: 1 }, // Di atas solar x=600,y=290
             { x: 972, y: 260, w: 20, h: 20, type: 'warta', collected: false, factIndex: 2 }, // Di atas solar x=950,y=290
             { x: 1422, y: 310, w: 20, h: 20, type: 'warta', collected: false, factIndex: 3 }, // Di atas solar x=1400,y=340
-            { x: 822, y: 310, w: 20, h: 20, type: 'warta', collected: false, factIndex: 4 }  // Di atas solar x=800,y=340
+            { x: 822, y: 310, w: 20, h: 20, type: 'warta', collected: false, factIndex: 4 },  // Di atas solar x=800,y=340
+            // 3 Silver Normal
+            { x: 500, y: 450, w: 20, h: 16, type: 'silver', collected: false }, 
+            { x: 1200, y: 450, w: 20, h: 16, type: 'silver', collected: false }, 
+            { x: 1700, y: 450, w: 20, h: 16, type: 'silver', collected: false }
         ],
         hazards: [
             { x: 1000, y: 480, w: 80, h: 24, type: 'electric_floor' }, // Di jurang pertama
@@ -492,8 +497,15 @@ export class Level { // class manajer level dan renderer
         }
 
         if (this.data.finishGate && checkAABB(player, this.data.finishGate)) {
-            const allQuizDone = this.data.npcs.every(npc => npc.quizDone);
-            if ((allQuizDone && player.barsCollected >= this.data.requiredBars) || this.isDevMode) {
+            // Cek apakah semua NPC tipe kuis sudah dijawab
+            const allQuizDone = this.data.npcs
+                .filter(npc => npc.type === 'quiz_robot')
+                .every(npc => npc.quizDone);
+                
+            const canFinishNormal = allQuizDone && player.barsCollected >= this.data.requiredBars;
+            
+            // Untuk level boss (hasBoss), biarkan tembus portal, nanti main.js yang ngecek bossDefeated
+            if (canFinishNormal || this.data.hasBoss || this.isDevMode) {
                 events.push({ type: 'reach_finish', data: null });
             }
         }
@@ -523,6 +535,14 @@ export class Level { // class manajer level dan renderer
         }
     }
 
+    spawnBossSilver(x, y) {
+        this.data.collectibles.push({
+            x: x, y: y, w: 20, h: 16, type: 'silver', collected: false,
+            isDynamic: true,
+            life: 480 // 8 seconds
+        });
+    }
+
     update() {
         this.animTimer++;
 
@@ -534,6 +554,18 @@ export class Level { // class manajer level dan renderer
             p.life--;
             if (p.life <= 0) {
                 this.particles.splice(i, 1);
+            }
+        }
+
+        if (this.data.collectibles) {
+            for (let i = this.data.collectibles.length - 1; i >= 0; i--) {
+                const item = this.data.collectibles[i];
+                if (item.isDynamic) {
+                    item.life--;
+                    if (item.life <= 0) {
+                        this.data.collectibles.splice(i, 1);
+                    }
+                }
             }
         }
     }
@@ -548,6 +580,9 @@ export class Level { // class manajer level dan renderer
 
         for (const item of this.data.collectibles) {
             if (!item.collected) {
+                if (item.isDynamic && item.life < 120 && Math.floor(item.life / 8) % 2 === 0) {
+                    continue; // Blinking effect when expiring
+                }
                 this.drawCollectible(ctx, item, camX);
             }
         }

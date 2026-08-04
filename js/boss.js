@@ -288,8 +288,8 @@ export class SuboAI {
     takeDamage(amount, isFrontal, isHeavy, attackerX) {
         if (this.state === 'HITSTOP') return false;
 
-        // Phase 2 Armor
-        if (this.phase >= 2 && isFrontal && !isHeavy) {
+        // Phase 2 Armor (hanya 25% kemungkinan block serangan biasa dari depan)
+        if (this.phase >= 2 && isFrontal && !isHeavy && Math.random() < 0.25) {
             return 'DEFLECT';
         }
 
