@@ -505,7 +505,7 @@ export class Level { // class manajer level dan renderer
             const canFinishNormal = allQuizDone && player.barsCollected >= this.data.requiredBars;
             
             // Untuk level boss (hasBoss), biarkan tembus portal, nanti main.js yang ngecek bossDefeated
-            if (canFinishNormal || this.data.hasBoss || this.isDevMode) {
+            if (canFinishNormal || this.data.hasBoss) {
                 events.push({ type: 'reach_finish', data: null });
             }
         }

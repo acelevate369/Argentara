@@ -70,7 +70,7 @@ class Game { // class utama yang mengatur game loop dan logic
 
         this._nearNPC = null;
         
-        this.isDevMode = false;
+
 
         this.unlockedLevel = parseInt(localStorage.getItem('argentara_unlocked_level') || '1');
 
@@ -113,7 +113,7 @@ class Game { // class utama yang mengatur game loop dan logic
             if (action === 'show') {
                 document.querySelectorAll('.btn-level').forEach(btn => {
                     const lNum = parseInt(btn.dataset.level);
-                    if (lNum <= this.unlockedLevel || this.isDevMode) {
+                    if (lNum <= this.unlockedLevel) {
                         btn.classList.remove('btn-locked');
                         btn.innerHTML = `LEVEL ${lNum}`;
                     } else {
@@ -123,21 +123,11 @@ class Game { // class utama yang mengatur game loop dan logic
                 });
                 this.ui.elements.levelMenuScreen.classList.remove('hidden');
             } else if (action === 'start') {
-                if (levelNum <= this.unlockedLevel || this.isDevMode) {
+                if (levelNum <= this.unlockedLevel) {
                     this.startGame(levelNum);
                 }
             }
         });
-        
-        this.ui.onToggleDevMode(() => {
-            this.isDevMode = !this.isDevMode;
-            this.level.isDevMode = this.isDevMode; // Sinkronkan state Dev Mode ke Level
-            if (this.isDevMode && this.player) {
-                this.player.score = 9999;
-            }
-            return this.isDevMode;
-        });
-
     }
 
     startGame(levelNumber = 1) { // inisialisasi level dan mulai bermain
@@ -163,7 +153,6 @@ class Game { // class utama yang mengatur game loop dan logic
         this.player.reset();
         
         this.state = STATE.PLAYING;
-        this.level.isDevMode = this.isDevMode; // Pastikan tersinkron saat pindah level
         
         // Bersihkan data boss state lama
         this.boss = null;
@@ -194,9 +183,7 @@ class Game { // class utama yang mengatur game loop dan logic
         this.ui.updateHUD(this.player.score, 0, this.level.data.requiredBars, this.currentLevel, this.player.hp, -1);
         this.ui.showMission(this.level.data.mission);
 
-        if (this.isDevMode) {
-            this.player.score = 9999;
-        }
+
 
         this._nearNPC = null;
         this._updateBGM(); // Set BGM first based on level
@@ -362,13 +349,7 @@ class Game { // class utama yang mengatur game loop dan logic
                 this.input.clearJustPressed();
                 return;
             } else if (this.state === STATE.QUIZ) {
-                // Jangan paksa tutup kuis untuk mencegah bypass, kecuali dev mode
-                if (this.isDevMode) {
-                    this.ui.elements.quizModal.classList.add('hidden');
-                    this.state = STATE.PLAYING;
-                    this.input.clearJustPressed();
-                    return;
-                }
+                // Jangan paksa tutup kuis untuk mencegah bypass
             }
         }
 
@@ -413,14 +394,7 @@ class Game { // class utama yang mengatur game loop dan logic
             return;
         }
 
-        if (this.isDevMode) {
-            if (this.input.isJustPressed('KeyR')) {
-                this.player.x = this.player.spawnX;
-                this.player.y = this.player.spawnY;
-                this.player.vx = 0;
-                this.player.vy = 0;
-            }
-        }
+
 
         this.player.update(this.input, this.level.data.platforms);
         
@@ -443,8 +417,8 @@ class Game { // class utama yang mengatur game loop dan logic
             
             // Cek jika player mencoba mendekati area boss
             if (this.player.x >= arenaEntryX) {
-                // Syarat: Minimal 5 Kuis Benar ATAU Dev Mode nyala
-                if (this.player.quizCorrect < 5 && !this.isDevMode) {
+                // Syarat: Minimal 5 Kuis Benar
+                if (this.player.quizCorrect < 5) {
                     // MENTOK DINDING!
                     this.player.x = arenaEntryX - 1; 
                     this.ui.showMission("SYARAT KURANG: JAWAB 5 KUIS DENGAN BENAR!");
@@ -670,17 +644,13 @@ class Game { // class utama yang mengatur game loop dan logic
                     return; // Stop processing events, game paused
 
                 case 'hit_hazard':
-                    if (this.isDevMode) break;
+
                     
                     this._triggerGameOver("Tersengat Listrik!");
                     break;
                     
                 case 'fell_off':
-                    if (this.isDevMode) {
-                        this.player.y = 0;
-                        this.player.vy = 0;
-                        break;
-                    }
+
                     
                     this._triggerGameOver("Jatuh ke Jurang!");
                     return;
@@ -708,7 +678,7 @@ class Game { // class utama yang mengatur game loop dan logic
     }
 
     _unlockNextLevel(levelNumber) {
-        if (this.isDevMode) return; // Jangan simpan progress kalau curang pakai Dev Mode
+
         if (levelNumber > this.unlockedLevel) {
             this.unlockedLevel = levelNumber;
             localStorage.setItem('argentara_unlocked_level', this.unlockedLevel.toString());
